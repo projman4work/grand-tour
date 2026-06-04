@@ -327,21 +327,19 @@
 </div>
 
 <!-- =========================================================
-     LIVE SYNC SETUP
-     Paste the firebaseConfig object from your Firebase project
-     between the braces below (steps are in the chat).
-     Leave it blank to keep running offline on this device only.
+     LIVE SYNC SETUP  (Railway sync service)
+     Points the planner at your private sync endpoint so the same
+     trip stays in sync across every device/person that opens this
+     page. NOTE: anyone with this URL + doc id below can view AND
+     edit the trip, so treat the link itself as the shared secret.
+     Leave url/secret/doc blank to run offline on this device only.
      ========================================================= -->
 <script>
-  window.FIREBASE_CONFIG = {
-    // apiKey: "...",
-    // authDomain: "...",
-    // projectId: "...",
-    // storageBucket: "...",
-    // messagingSenderId: "...",
-    // appId: "..."
+  window.SYNC = {
+    url:    "https://grand-tour-sync-production.up.railway.app",
+    secret: "u23qQWVzXpfk51QbzIKU-l0x",
+    doc:    "gt-de8dd5183d841579"   // shared trip id; change it for a separate, private trip
   };
-  window.CLOUD_DOC = "trip"; // you both share this. Change it only if you want a separate, private trip.
 </script>
 
 <script>
@@ -892,42 +890,66 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
 render();
 </script>
 
-<script type="module">
-  const cfg = window.FIREBASE_CONFIG || {};
-  const statusEl = document.getElementById("syncStatus");
-  const setStatus = (t,c)=>{ if(statusEl){ statusEl.textContent=t; statusEl.className="sync "+c; } };
-  if(!(cfg && cfg.apiKey && cfg.projectId)){
-    setStatus("Local only","off");
-  } else {
-    setStatus("Connecting","wait");
-    try{
-      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-      const { getFirestore, doc, onSnapshot, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      const db = getFirestore(initializeApp(cfg));
-      const ref = doc(db, "grandtour", window.CLOUD_DOC || "trip");
-      let timer=null;
-      window.cloud = { save:(state)=>{
-        clearTimeout(timer);
-        timer=setTimeout(()=>{
-          setDoc(ref, { data: JSON.stringify(state), ts: Date.now() })
-            .then(()=>setStatus("Live","on"))
-            .catch(()=>setStatus("Sync error","off"));
-        }, 400);
-      }};
-      onSnapshot(ref, (snap)=>{
-        if(snap.metadata.hasPendingWrites) return;     // skip our own writes
-        if(snap.exists()){
-          try{ const remote = JSON.parse(snap.data().data); if(window.applyRemote) window.applyRemote(remote); }catch(e){}
-          setStatus("Live","on");
-        } else if(window.getState){                    // nothing online yet, seed it
-          window.cloud.save(window.getState());
-          setStatus("Live","on");
-        }
-      }, ()=> setStatus("Offline","off"));
-    }catch(e){
+<script>
+  (function(){
+    const cfg = window.SYNC || {};
+    const statusEl = document.getElementById("syncStatus");
+    const setStatus = (t,c)=>{ if(statusEl){ statusEl.textContent=t; statusEl.className="sync "+c; } };
+    if(!(cfg.url && cfg.secret && cfg.doc)){
       setStatus("Local only","off");
+      return;
     }
-  }
+    const base = cfg.url.replace(/\/+$/,"") + "/trip/" + encodeURIComponent(cfg.doc);
+    let myLastTs = 0;   // ts of our most recent write (to ignore our own echo)
+    let seenTs   = 0;   // ts we have already applied
+    let saveTimer = null;
+
+    setStatus("Connecting","wait");
+
+    function push(state){
+      const ts = Date.now();
+      myLastTs = ts;
+      return fetch(base, {
+        method:"PUT",
+        headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+cfg.secret },
+        body: JSON.stringify({ data: JSON.stringify(state), ts: ts })
+      }).then(r=>{
+        if(!r.ok) throw new Error(r.status);
+        seenTs = ts;
+        setStatus("Live","on");
+      }).catch(()=> setStatus("Sync error","off"));
+    }
+
+    window.cloud = { save:(state)=>{           // debounced upload, called by save()
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(()=> push(state), 400);
+    }};
+
+    function pull(){
+      return fetch(base, { headers:{ "Accept":"application/json" } })
+        .then(r=>{
+          if(r.status === 204) return null;     // nothing stored yet
+          if(!r.ok) throw new Error(r.status);
+          return r.json();
+        })
+        .then(doc=>{
+          if(!doc){                             // empty cloud -> seed it from our state
+            if(window.getState) push(window.getState());
+            else setStatus("Live","on");
+            return;
+          }
+          if(doc.ts && doc.ts !== myLastTs && doc.ts !== seenTs){
+            try{ const remote = JSON.parse(doc.data); if(window.applyRemote) window.applyRemote(remote); }catch(e){}
+            seenTs = doc.ts;
+          }
+          setStatus("Live","on");
+        })
+        .catch(()=> setStatus("Offline","off"));
+    }
+
+    pull();                      // initial sync
+    setInterval(pull, 4000);     // poll for remote changes
+  })();
 </script>
 </body>
 </html>
