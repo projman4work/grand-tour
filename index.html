@@ -290,7 +290,7 @@
   <header class="mast">
     <div class="eyebrow" id="eyebrow">An Itinerary</div>
     <h1 id="title">The Grand Tour</h1>
-    <div class="sub" id="subtitle">Nashville &middot; London &middot; Devon &middot; Normandy &middot; Paris &middot; Barcelona</div>
+    <div class="sub" id="subtitle">Nashville &middot; London &middot; Devon &middot; Paris &middot; Barcelona</div>
     <div class="rule-orn">
       <span class="ln"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="12" cy="12" r="9"/><path d="M12 4l2.2 5.8L20 12l-5.8 2.2L12 20l-2.2-5.8L4 12l5.8-2.2z"/></svg>
@@ -368,7 +368,7 @@ const SEED = {
   meta:{
     eyebrow:"Volume I",
     title:"A <span class='amp'>+</span> B's First Grand Tour",
-    subtitle:"Nashville &middot; London &middot; Devon &middot; (Normandy) &middot; Paris &middot; Barcelona"
+    subtitle:"Nashville &middot; London &middot; Devon &middot; Paris &middot; Barcelona"
   },
   items:[
     { id:"j1", type:"journey", mode:"plane", from:"Nashville (BNA)", to:"London (LHR)",
@@ -413,43 +413,16 @@ const SEED = {
       ]
     },
 
-    { id:"j3", type:"journey", mode:"ferry", from:"Devon", to:"France (Normandy / Paris)",
-      date:"2026-07-03", duration:"see options", operator:"Decision needed",
+    { id:"j3", type:"journey", mode:"plane", from:"Devon", to:"Paris (CDG)",
+      date:"2026-07-03", duration:"approx 5h door to door", operator:"CrossCountry train + A1 Airport Flyer + easyJet",
       status:"idea",
-      note:"Note: the cross-Channel ferry moved from Weymouth to Poole (Condor's old Weymouth route has gone). Three ways to do this leg are below. Pick one and the times and bookings can be firmed up.",
-      options:[
-        { label:"A · Fly, no car", detail:"Drive Devon to Bristol Airport (about 1h 30m), then easyJet Bristol to Paris CDG (about 1h 20m, roughly 20 flights a week). Do Paris first and treat Normandy as a long day trip or a train side-trip from Bayeux.",
-          pros:"Fastest. No ferry or car needed.", cons:"Normandy is awkward without a car, and Mont Saint-Michel especially so." },
-        { label:"B · Ferry with your own car", detail:"Drive Devon to Poole (about 1h 45m), then Brittany Ferries Poole to Cherbourg (about 4h 45m, daily in summer) with the car aboard. Full Normandy road trip, then drive to Paris.",
-          pros:"Full freedom in Normandy, with the car throughout.", cons:"Getting the car home before Barcelona is the problem. Works best if France is the focus and Barcelona is reconsidered." },
-        { label:"C · Car-free across, hire in Normandy", detail:"Reach Paris car-free (Eurostar from London, or fly Bristol to Paris), pick up a hire car for a quick Normandy loop based in Bayeux, drop it, then carry on by train or air.",
-          pros:"Normandy flexibility without taking a car across the Channel or down to Spain.", cons:"One car hire to arrange and return." }
-      ],
-      decision:"" },
-
-    { id:"s3", type:"stop", country:"France", flag:"Normandy",
-      place:"(Normandy)", region:"A night in Bayeux, or just a drive-through. Not decided yet.",
-      dateStart:"2026-07-03", dateEnd:"2026-07-04",
-      lodgingName:"To be decided", lodgingType:"Hotel in Bayeux", lodgingStatus:"idea",
-      summary:"Still deciding: a night in Bayeux for the D-Day coast and Mont Saint-Michel, or just a drive through on the way to Paris.",
-      guide:[
-        { id:"g14", cat:"see", title:"The American sector", note:"Utah Beach, Pointe du Hoc, Omaha Beach with the Les Braves sculpture, and Sainte-Mere-Eglise with the Airborne Museum.", ticket:true, status:"idea" },
-        { id:"g15", cat:"see", title:"Normandy American Cemetery, Colleville-sur-Mer", note:"Free to visit, open 9 to 5, set above Omaha Beach. Worth an unhurried hour.", ticket:false, status:"" },
-        { id:"g16", cat:"see", title:"Bayeux Tapestry & Arromanches", note:"The 900-year-old tapestry in town, and the remains of the Mulberry harbour out at Arromanches.", ticket:true, status:"idea" },
-        { id:"g17", cat:"see", title:"Mont Saint-Michel", note:"About 1h 15m from Bayeux. Abbey entry is around 16 euros, open roughly 9 to 7 in summer. Book online to skip the queue, and check the tide times.", ticket:true, status:"tobook" },
-        { id:"g18", cat:"eat", title:"Eat Normandy", note:"Camembert, cider and Calvados, moules, and the Bayeux market for everything in between.", ticket:false, status:"" }
-      ]
-    },
-
-    { id:"j4", type:"journey", mode:"train", from:"Bayeux", to:"Paris",
-      date:"2026-07-04", duration:"approx 2h 15m by train (or about 3h driving)", operator:"SNCF to Paris Saint-Lazare",
-      status:"idea", note:"Direct trains run Bayeux to Paris Saint-Lazare. If you took the car across, it is a straight drive in instead." },
+      note:"Normandy dropped, straight to Paris. Plan: get dropped at Torquay station for a direct CrossCountry train to Bristol Temple Meads (about 1h 45m, around 5 direct services a day, no change), then the A1 Airport Flyer bus to Bristol Airport (about 30 to 40 min, every few minutes). easyJet is the only nonstop Bristol to Paris and flies to CDG; the midday departure (around 12:57, into CDG mid-afternoon) fits best. Aim to leave Torquay by about 08:00. The route is not daily, so confirm the flight runs on Fri 3 July when booking." },
 
     { id:"s4", type:"stop", country:"France", flag:"France",
       place:"Paris", region:"Le Marais or Saint-Germain",
-      dateStart:"2026-07-04", dateEnd:"2026-07-07",
+      dateStart:"2026-07-03", dateEnd:"2026-07-07",
       lodgingName:"Hôtel Serotel Lutèce", lodgingType:"5th, Latin Quarter", lodgingStatus:"tobook", lodgingUrl:"https://www.booking.com/hotel/fr/serotellutece.html?label=gen173bo-10CAEoggI46AdIM1gDaI4CiAEBmAEzuAEHyAEM2AED6AEB-AEBiAIBmAIhqAIBuAL094DRBsACAdICJGJhOTEzYmRmLWIzNmUtNDljNS1iOGM5LWJkMDYwZTdjNjVkNNgCAeACAQ&aid=304142&ucfs=1&checkin=2026-07-03&checkout=2026-07-06&dest_id=-1456928&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Bprice%3DUSD-min-280-1%3Broomfacility%3D38%3Bclass%3D4%3Breview_score%3D90%3Breview_score%3D80&srpvid=290b6702e53a01e6&srepoch=1780498892&matching_block_id=5127602_88550588_0_2_0&atlas_src=sr_iw_title",
-      summary:"Three nights. Book the timed-entry tickets first, then plan the rest around them.",
+      summary:"Four nights. Book the timed-entry tickets first, then plan the rest around them.",
       guide:[
         { id:"g20", cat:"see", title:"Eiffel Tower", note:"Summit tickets sell out, especially in the evening. Book ahead.", ticket:true, status:"tobook" },
         { id:"g21", cat:"see", title:"The Louvre", note:"Timed entry is mandatory, and it is closed on Tuesdays.", ticket:true, status:"tobook" },
