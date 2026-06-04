@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Grand Tour &middot; Summer 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#8f9e80;
+    --sage-deep:#6c7a5e;
+    --sage-shadow:#586549;
+    --parchment:#f6f1e3;
+    --parchment-2:#eee4cf;
+    --parchment-edge:#e3d8bc;
+    --ink:#272c22;
+    --ink-soft:#454c3c;
+    --muted:#6f7461;
+    --gold:#a9854a;
+    --gold-deep:#876733;
+    --burgundy:#7b3a33;
+    --burgundy-soft:#9a544b;
+    --line:#cfc6aa;
+    --radius:3px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 50% -10%, rgba(255,255,255,.10), transparent 60%),
+      radial-gradient(circle at 50% 120%, rgba(0,0,0,.14), transparent 55%),
+      var(--sage);
+    color:var(--ink);
+    font-family:"EB Garamond", Georgia, "Times New Roman", serif;
+    font-size:18px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  /* faint engraved paper texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.05;
+    background-image:repeating-linear-gradient(0deg, rgba(0,0,0,.6) 0 1px, transparent 1px 3px);
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{position:relative; z-index:1; max-width:880px; margin:0 auto; padding:34px 22px 90px;}
+
+  /* ---------- Masthead ---------- */
+  .mast{ text-align:center; color:var(--parchment); padding:14px 0 26px; }
+  .mast .eyebrow{
+    font-family:"EB Garamond",serif; text-transform:uppercase; letter-spacing:.42em;
+    font-size:12px; opacity:.85; margin-bottom:14px; padding-left:.42em;
+  }
+  .mast h1{
+    font-family:"Cormorant Garamond", serif; font-weight:600;
+    font-size:clamp(40px, 9vw, 74px); line-height:.98; margin:0; letter-spacing:.5px;
+    text-shadow:0 2px 0 rgba(0,0,0,.10);
+  }
+  .mast h1 .amp{ font-style:italic; font-weight:500; color:#e9dfc4; }
+  .mast .sub{
+    font-family:"Cormorant Garamond",serif; font-style:italic; font-size:clamp(18px,3vw,24px);
+    margin-top:10px; opacity:.95;
+  }
+  .rule-orn{ display:flex; align-items:center; justify-content:center; gap:14px; margin:18px auto 6px; max-width:340px; opacity:.9;}
+  .rule-orn .ln{ height:1px; background:var(--parchment); flex:1; opacity:.6;}
+  .rule-orn svg{ width:26px; height:26px; color:var(--parchment); }
+
+  .stats{
+    display:flex; justify-content:center; gap:0; flex-wrap:wrap; margin-top:14px;
+    color:var(--parchment);
+  }
+  .stats .stat{ padding:0 20px; text-align:center; border-right:1px solid rgba(255,255,255,.28); }
+  .stats .stat:last-child{ border-right:none; }
+  .stats .num{ font-family:"Cormorant Garamond",serif; font-size:30px; font-weight:600; line-height:1; }
+  .stats .lbl{ text-transform:uppercase; letter-spacing:.22em; font-size:10.5px; opacity:.82; margin-top:4px;}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center;
+    margin:18px 0 30px;
+  }
+  button{ font-family:"EB Garamond",serif; cursor:pointer; }
+  .btn{
+    background:var(--parchment); color:var(--ink); border:1px solid var(--gold);
+    padding:7px 14px; border-radius:var(--radius); font-size:14px; letter-spacing:.04em;
+    transition:all .15s ease; white-space:nowrap;
+  }
+  .btn:hover{ background:var(--gold); color:#fff7e6; }
+  .btn.ghost{ background:transparent; color:var(--parchment); border-color:rgba(255,255,255,.55); }
+  .btn.ghost:hover{ background:rgba(255,255,255,.12); color:#fff; }
+  .btn.on{ background:var(--gold); color:#fff7e6; box-shadow:inset 0 0 0 1px rgba(255,255,255,.4); }
+  .btn-row{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+
+  /* ---------- Timeline ---------- */
+  .timeline{ position:relative; padding-left:34px; }
+  .timeline::before{
+    content:""; position:absolute; left:9px; top:8px; bottom:8px; width:2px;
+    background:linear-gradient(var(--parchment-edge), var(--gold) , var(--parchment-edge));
+    opacity:.6;
+  }
+  .node{ position:relative; margin:0 0 16px; }
+  .node .dot{
+    position:absolute; left:-34px; top:20px; width:20px; height:20px; transform:translateX(0);
+    color:var(--gold);
+  }
+  .node .dot svg{ width:20px; height:20px; display:block; filter:drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+
+  /* Stop card */
+  .card{
+    background:linear-gradient(180deg, var(--parchment), var(--parchment-2));
+    border:1px solid var(--parchment-edge);
+    border-radius:var(--radius);
+    box-shadow:0 6px 18px rgba(40,46,30,.22), inset 0 0 0 1px rgba(255,255,255,.35);
+    position:relative; overflow:hidden;
+  }
+  .card::after{ /* thin inner frame */
+    content:""; position:absolute; inset:5px; border:1px solid rgba(169,133,74,.32); border-radius:2px; pointer-events:none;
+  }
+  .card-head{ display:flex; align-items:flex-start; gap:14px; padding:18px 20px; cursor:pointer; }
+  .card-head .grow{ flex:1; min-width:0; }
+  .place-kicker{ display:flex; align-items:center; gap:9px; margin-bottom:2px; flex-wrap:wrap;}
+  .flag{
+    font-family:"EB Garamond",serif; text-transform:uppercase; letter-spacing:.2em; font-size:10.5px;
+    color:var(--gold-deep); border:1px solid var(--line); padding:1px 7px; border-radius:20px; background:rgba(255,255,255,.4);
+  }
+  .place-name{ font-family:"Cormorant Garamond",serif; font-weight:600; font-size:30px; line-height:1.04; margin:0; color:var(--ink);}
+  .place-region{ font-style:italic; color:var(--muted); font-size:16px; }
+  .dates{ font-family:"EB Garamond",serif; font-size:14px; color:var(--ink-soft); margin-top:5px; letter-spacing:.02em;}
+  .lodging{ font-size:15px; color:var(--ink-soft); margin-top:4px; }
+  .lodging .lk{ color:var(--muted); text-transform:uppercase; letter-spacing:.16em; font-size:10.5px; margin-right:6px;}
+  .summary{ font-style:italic; color:var(--ink-soft); margin-top:9px; font-size:16.5px; }
+
+  .chev{ color:var(--gold-deep); flex:none; transition:transform .2s ease; margin-top:6px;}
+  .node.open .chev{ transform:rotate(90deg); }
+  .chev svg{ width:16px; height:16px; display:block; }
+
+  .body{ display:none; padding:0 20px 20px; }
+  .node.open .body{ display:block; }
+
+  .grp{ margin-top:16px; }
+  .grp-title{
+    display:flex; align-items:center; gap:10px; margin:0 0 8px;
+    font-family:"EB Garamond",serif; text-transform:uppercase; letter-spacing:.24em; font-size:11.5px; color:var(--gold-deep);
+  }
+  .grp-title .gl{ height:1px; background:var(--line); flex:1; }
+  .item{ padding:8px 0; border-bottom:1px dashed rgba(169,133,74,.28); }
+  .item:last-child{ border-bottom:none; }
+  .item-top{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .item-title{ font-weight:600; color:var(--ink); font-size:17px; }
+  .item-note{ color:var(--ink-soft); font-size:15.5px; }
+  .tags{ display:inline-flex; gap:6px; flex-wrap:wrap; vertical-align:middle;}
+  .tag{ font-family:"EB Garamond",serif; font-size:10.5px; text-transform:uppercase; letter-spacing:.14em; padding:1px 8px; border-radius:20px; line-height:1.7; }
+  .tag.ticket{ background:var(--burgundy); color:#f7e9e2; }
+  .tag.booked{ background:#3f5b3c; color:#eef6ea; }
+  .tag.tobook{ background:#bb8a36; color:#fff6e3; }
+  .tag.idea{ background:#e7ddc4; color:var(--gold-deep); border:1px solid var(--line); }
+  .item .mini{ margin-top:5px; display:flex; gap:6px; }
+
+  .icon-btn{
+    background:transparent; border:1px solid var(--line); color:var(--gold-deep);
+    border-radius:var(--radius); padding:2px 9px; font-size:12.5px; letter-spacing:.04em;
+  }
+  .icon-btn:hover{ background:var(--gold); color:#fff7e6; border-color:var(--gold);}
+  .icon-btn.danger:hover{ background:var(--burgundy); border-color:var(--burgundy); color:#fff;}
+
+  .card-tools{ display:flex; gap:6px; padding:0 20px 16px; }
+
+  /* Journey card */
+  .journey{
+    background:rgba(246,241,227,.55);
+    border:1px dashed var(--gold); border-radius:var(--radius);
+    padding:12px 16px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .journey .mode{ color:var(--gold-deep); flex:none; margin-top:2px;}
+  .journey .mode svg{ width:26px; height:26px; display:block; }
+  .journey .jgrow{ flex:1; min-width:0;}
+  .journey .route{ font-family:"Cormorant Garamond",serif; font-weight:600; font-size:21px; color:var(--ink); line-height:1.1;}
+  .journey .route .arr{ color:var(--gold-deep); margin:0 7px; }
+  .journey .jmeta{ font-size:14px; color:var(--ink-soft); margin-top:3px; }
+  .journey .jmeta b{ font-weight:600; }
+  .journey .jnote{ font-style:italic; color:var(--muted); font-size:14.5px; margin-top:4px; }
+  .journey .jtools{ display:flex; gap:6px; margin-top:8px; }
+
+  /* Options (the France decision) */
+  .options{ margin-top:12px; display:grid; gap:10px; }
+  .opt{
+    background:#fff; border:1px solid var(--parchment-edge); border-left:3px solid var(--gold);
+    border-radius:var(--radius); padding:11px 13px;
+  }
+  .opt h4{ margin:0 0 4px; font-family:"Cormorant Garamond",serif; font-size:19px; color:var(--ink); font-weight:600;}
+  .opt .od{ font-size:15px; color:var(--ink-soft); }
+  .opt .pc{ display:flex; gap:18px; flex-wrap:wrap; margin-top:6px; font-size:14px;}
+  .opt .pc .pcl{ text-transform:uppercase; letter-spacing:.14em; font-size:10px; }
+  .opt .pros .pcl{ color:#3f5b3c;} .opt .cons .pcl{ color:var(--burgundy);}
+  .decision{
+    margin-top:10px; background:rgba(123,58,51,.06); border:1px solid rgba(123,58,51,.25);
+    border-radius:var(--radius); padding:10px 13px; font-size:15px;
+  }
+  .decision .dl{ text-transform:uppercase; letter-spacing:.18em; font-size:10.5px; color:var(--burgundy); margin-right:8px;}
+
+  .add-item-row{ margin-top:12px; }
+
+  /* ---------- Modal ---------- */
+  .scrim{ position:fixed; inset:0; background:rgba(40,46,30,.55); backdrop-filter:blur(2px); display:none; z-index:50; align-items:flex-start; justify-content:center; overflow-y:auto; padding:40px 16px;}
+  .scrim.show{ display:flex; }
+  .modal{
+    background:linear-gradient(180deg,var(--parchment),var(--parchment-2));
+    border:1px solid var(--gold); border-radius:var(--radius);
+    box-shadow:0 24px 60px rgba(0,0,0,.4); width:100%; max-width:560px; padding:24px; position:relative;
+  }
+  .modal h3{ font-family:"Cormorant Garamond",serif; font-size:28px; font-weight:600; margin:0 0 4px;}
+  .modal .mhint{ font-style:italic; color:var(--muted); margin:0 0 16px; font-size:15px;}
+  .fld{ margin-bottom:13px; }
+  .fld label{ display:block; text-transform:uppercase; letter-spacing:.16em; font-size:10.5px; color:var(--gold-deep); margin-bottom:4px;}
+  .fld input, .fld select, .fld textarea{
+    width:100%; font-family:"EB Garamond",serif; font-size:16px; color:var(--ink);
+    background:#fffdf6; border:1px solid var(--line); border-radius:var(--radius); padding:8px 10px;
+  }
+  .fld textarea{ min-height:62px; resize:vertical; }
+  .fld.check{ display:flex; align-items:center; gap:8px;}
+  .fld.check input{ width:auto; }
+  .fld.check label{ margin:0; }
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-actions{ display:flex; justify-content:space-between; gap:10px; margin-top:18px; align-items:center;}
+  .modal-actions .right{ display:flex; gap:8px; }
+  .opt-edit{ border:1px dashed var(--line); border-radius:var(--radius); padding:12px; margin-bottom:10px; position:relative;}
+  .opt-edit .rm{ position:absolute; top:8px; right:8px; }
+
+  .empty{ text-align:center; color:var(--parchment); opacity:.85; font-style:italic; padding:40px 0;}
+  .foot{ text-align:center; color:var(--parchment); opacity:.7; font-size:13px; margin-top:34px; font-style:italic;}
+
+  @media (max-width:560px){
+    body{ font-size:17px; }
+    .place-name{ font-size:25px; }
+    .stats .stat{ padding:0 12px; }
+    .two{ grid-template-columns:1fr; }
+    .card-head{ padding:15px; }
+  }
+  @media print{
+    body{ background:#fff; color:#000; }
+    .toolbar,.card-tools,.icon-btn,.add-item-row,.chev{ display:none !important; }
+    .node .body{ display:block !important; }
+    .mast,.stats,.foot{ color:#000; }
+  }
+  /* ---------- Hotel shortlist ---------- */
+  .stays{ display:block; }
+  .stay{ background:#fffdf6; border:1px solid var(--parchment-edge); border-radius:var(--radius); overflow:hidden; margin-bottom:14px; box-shadow:0 2px 8px rgba(40,46,30,.10); }
+  .stay-body{ padding:14px 16px; }
+  .stay-head{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+  .stay-go{ margin-left:auto; flex:none; display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid var(--gold); color:var(--gold-deep); text-decoration:none; transition:all .15s ease; }
+  .stay-go:hover{ background:var(--gold); color:#fff7e6; }
+  .stay-go svg{ width:16px; height:16px; }
+  .stay-rank{ font-family:"Cormorant Garamond",serif; font-size:23px; font-weight:600; color:var(--gold-deep); }
+  .stay-name{ font-family:"Cormorant Garamond",serif; font-size:22px; font-weight:600; color:var(--ink); line-height:1.05; }
+  .stay-area{ font-style:italic; color:var(--muted); font-size:15px; }
+  .stay-meta{ display:flex; gap:8px; flex-wrap:wrap; margin:9px 0 4px; }
+  .score-badge{ background:#3f5b3c; color:#eef6ea; border-radius:20px; padding:2px 11px; font-size:13px; }
+  .price-badge{ background:var(--parchment-2); color:var(--ink-soft); border:1px solid var(--line); border-radius:20px; padding:2px 11px; font-size:13px; }
+  .pc-cols{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px; }
+  .pc-cols h5{ margin:0 0 5px; text-transform:uppercase; letter-spacing:.16em; font-size:10.5px; }
+  .pc-cols .good h5{ color:#3f5b3c; }
+  .pc-cols .bad h5{ color:var(--burgundy); }
+  .pc-cols ul{ margin:0; padding-left:16px; }
+  .pc-cols li{ font-size:14.5px; color:var(--ink-soft); margin-bottom:4px; }
+  .stay-link{ margin-top:12px; font-size:13.5px; }
+  @media (max-width:560px){ .pc-cols{ grid-template-columns:1fr; } }
+
+  /* ---------- Live sync + ranking ---------- */
+  .sync{ font-family:"EB Garamond",serif; font-size:12px; text-transform:uppercase; letter-spacing:.18em; padding:5px 13px; border-radius:20px; border:1px solid rgba(255,255,255,.45); color:var(--parchment); align-self:center; }
+  .sync.on{ background:rgba(63,91,60,.55); border-color:#bfe0b8; }
+  .sync.off{ opacity:.7; }
+  .sync.wait{ opacity:.9; }
+  .rank-hint{ font-style:italic; color:var(--muted); font-size:13px; margin:-2px 0 9px; }
+  .rank-ctrl{ display:inline-flex; flex-direction:column; gap:2px; margin-right:3px; }
+  .rk{ border:1px solid var(--line); background:transparent; color:var(--gold-deep); border-radius:3px; font-size:9px; line-height:1; padding:2px 5px; }
+  .rk:hover{ background:var(--gold); color:#fff7e6; border-color:var(--gold); }
+  .lodge-go{ display:inline-flex; vertical-align:middle; margin-left:6px; color:var(--gold-deep); text-decoration:none; }
+  .lodge-go svg{ width:14px; height:14px; }
+  .lodge-go:hover{ color:var(--gold); }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow" id="eyebrow">An Itinerary</div>
+    <h1 id="title">The Grand Tour</h1>
+    <div class="sub" id="subtitle">Nashville &middot; London &middot; Devon &middot; Normandy &middot; Paris &middot; Barcelona</div>
+    <div class="rule-orn">
+      <span class="ln"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="12" cy="12" r="9"/><path d="M12 4l2.2 5.8L20 12l-5.8 2.2L12 20l-2.2-5.8L4 12l5.8-2.2z"/></svg>
+      <span class="ln"></span>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="toolbar">
+    <div class="btn-row">
+      <button class="btn ghost" id="addStop">+ Add stop</button>
+      <button class="btn ghost" id="addJourney">+ Add journey</button>
+      <button class="btn ghost" id="filterBook">Show bookings only</button>
+      <button class="btn ghost" id="expandAll">Collapse all</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" id="editHead">Rename trip</button>
+      <button class="btn ghost" id="exportBtn">Export</button>
+      <button class="btn ghost" id="importBtn">Import</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+    <span id="syncStatus" class="sync off">Local only</span>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="foot">Everything here is editable, and changes save in this browser. Use Export to back it up or send a copy across.</div>
+</div>
+
+<!-- Modal -->
+<div class="scrim" id="scrim">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- =========================================================
+     LIVE SYNC SETUP
+     Paste the firebaseConfig object from your Firebase project
+     between the braces below (steps are in the chat).
+     Leave it blank to keep running offline on this device only.
+     ========================================================= -->
+<script>
+  window.FIREBASE_CONFIG = {
+    // apiKey: "...",
+    // authDomain: "...",
+    // projectId: "...",
+    // storageBucket: "...",
+    // messagingSenderId: "...",
+    // appId: "..."
+  };
+  window.CLOUD_DOC = "trip"; // you both share this. Change it only if you want a separate, private trip.
+</script>
+
+<script>
+"use strict";
+
+/* ============================================================
+   ICONS (engraved line style)
+============================================================ */
+const ICON = {
+  plane:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16.5L13 12V5.5a1.5 1.5 0 0 0-3 0V12L2 16.5V18l8-2.2V20l-2 1.4V22l3.5-1L15 22v-.6L13 20v-4.2L21 18z"/></svg>',
+  train:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="14" rx="3"/><path d="M6 11h12M9 17l-2 3M15 17l2 3"/><circle cx="9" cy="14" r=".6" fill="currentColor"/><circle cx="15" cy="14" r=".6" fill="currentColor"/></svg>',
+  car:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13l1.5-4.5A2 2 0 0 1 7.4 7h9.2a2 2 0 0 1 1.9 1.5L20 13M4 13h16v4H4zM4 13v-1M20 13v-1"/><circle cx="7.5" cy="17" r="1.4"/><circle cx="16.5" cy="17" r="1.4"/></svg>',
+  ferry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16c1.5 1.2 3 1.2 4.5 0S10.5 14.8 12 16s3 1.2 4.5 0S19.5 14.8 21 16M5 14l1-5h12l1 5M12 4v5M9 9V6.5h6V9"/></svg>',
+  coach:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="11" rx="2"/><path d="M3 11h18M8 16v2M16 16v2"/><circle cx="7" cy="13.5" r=".6" fill="currentColor"/><circle cx="17" cy="13.5" r=".6" fill="currentColor"/></svg>',
+  stop:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.6 6.9L22 11l-7.4 2.1L12 20l-2.6-6.9L2 11l7.4-2.1z"/></svg>',
+  go:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'
+};
+const CAT = { see:"See & Do", eat:"Eat & Drink", exp:"Experiences", note:"Good to know" };
+const CAT_ORDER = ["see","eat","exp","note"];
+
+/* ============================================================
+   SEED ITINERARY  (researched May 2026 — all editable)
+============================================================ */
+const SEED = {
+  meta:{
+    eyebrow:"Volume I",
+    title:"A <span class='amp'>+</span> B's First Grand Tour",
+    subtitle:"Nashville &middot; London &middot; Devon &middot; (Normandy) &middot; Paris &middot; Barcelona"
+  },
+  items:[
+    { id:"j1", type:"journey", mode:"plane", from:"Nashville (BNA)", to:"London (LHR)",
+      date:"2026-06-28", depart:"08:40", arrive:"06:30 (+1)", duration:"15h 50m", operator:"JetBlue",
+      status:"booked", note:"One stop in Boston (6h 29m layover). Lands Heathrow on the morning of the 29th. Heathrow to Prestwood is about an hour by car." },
+
+    { id:"s1", type:"stop", country:"England", flag:"United Kingdom",
+      place:"London & The Chilterns", region:"Easing in at home, Prestwood",
+      dateStart:"2026-06-29", dateEnd:"2026-07-01",
+      lodgingName:"Home, Prestwood", lodgingType:"Your house", lodgingStatus:"booked",
+      summary:"Two days to recover from the overnight flight before heading west. Some London if there is time, with the Chilterns on the doorstep.",
+      guide:[
+        { id:"g1", cat:"see", title:"Roald Dahl Museum, Great Missenden", note:"Five minutes up the road and open until at least early 2027 before it closes to redevelop. The village trail takes in his grave, the petrol pumps from Danny, and Matilda's library.", ticket:true, status:"idea" },
+        { id:"g2", cat:"see", title:"A Chilterns walk", note:"The Ridgeway or South Bucks Way through the beech woods. Boug's Meadow in Prestwood for a quiet sit, and watch for red kites overhead.", ticket:false, status:"" },
+        { id:"g3", cat:"see", title:"London highlights", note:"South Bank stroll past Tate Modern and Borough Market, the British Museum (free), Westminster. The Tower of London and any West End show want booking ahead.", ticket:true, status:"idea" },
+        { id:"g39", cat:"see", title:"30 June: Eton & Windsor", note:"A possible day on the 30th: Eton (your old school) and Windsor, with an early-afternoon lunch at the Riverside in Thame if it comes off. Book the table ahead.", ticket:false, status:"tobook" },
+        { id:"g4", cat:"eat", title:"The village pubs", note:"The Nags Head was Dahl's local. The Cross Keys and The George do a proper Sunday roast.", ticket:false, status:"" },
+        { id:"g5", cat:"exp", title:"Keep day one light", note:"She arrives tired after the overnight flight. A short walk and an early dinner works better than a full London day.", ticket:false, status:"" },
+        { id:"g6", cat:"note", title:"Book the next leg now", note:"Lock in whichever France crossing you choose, plus Tower of London and any show, while you are sitting still.", ticket:false, status:"tobook" }
+      ]
+    },
+
+    { id:"j2", type:"journey", mode:"car", from:"Prestwood", to:"Babbacombe, Devon",
+      date:"2026-07-01", depart:"", arrive:"", duration:"approx 3h 30m – 4h", operator:"By car (or train to Teignmouth + taxi)",
+      status:"idea", note:"The lane down to the Cary Arms is famously steep and easy to miss. Take it slowly. By rail it is Teignmouth station then a short taxi." },
+
+    { id:"s2", type:"stop", country:"England", flag:"English Riviera",
+      place:"Cary Arms & Spa", region:"Babbacombe Bay, the English Riviera",
+      dateStart:"2026-07-01", dateEnd:"2026-07-03",
+      lodgingName:"Cary Arms & Spa", lodgingType:"Seaside inn", lodgingStatus:"booked",
+      summary:"A sheltered bay with red cliffs and a sea-facing spa, with the South West Coast Path from the door.",
+      guide:[
+        { id:"g7", cat:"see", title:"South West Coast Path", note:"The Babbacombe to Maidencombe stretch is one of Devon's prettiest cliff walks, straight from the door.", ticket:false, status:"" },
+        { id:"g8", cat:"see", title:"Babbacombe Cliff Railway", note:"A Victorian funicular down to the beach. Cheap, charming, and saves the climb.", ticket:true, status:"idea" },
+        { id:"g9", cat:"see", title:"Kents Cavern & Brixham", note:"Prehistoric caves at Kents Cavern, and the working fishing harbour at Brixham. Babbacombe Model Village is close by too.", ticket:true, status:"idea" },
+        { id:"g10", cat:"eat", title:"Devon cream tea", note:"Scones, clotted cream and jam. The Devon way is cream first, then jam.", ticket:false, status:"" },
+        { id:"g11", cat:"eat", title:"Brixham seafood & local cider", note:"Brixham lands some of the best catch in the country, minutes away. The Cary Arms kitchen uses a lot of local produce.", ticket:false, status:"" },
+        { id:"g12", cat:"exp", title:"The spa", note:"Waterfall hydrotherapy pool with sea views, sauna and steam. Treatments book up, so reserve before you arrive.", ticket:true, status:"tobook" },
+        { id:"g13", cat:"exp", title:"Out on the water", note:"Kayaks and paddleboards in the bay, or drinks on the terrace at sunset.", ticket:false, status:"" },
+        { id:"g40", cat:"exp", title:"Swim the bay", note:"Open-water swim across Babbacombe Bay, clear water and sheltered. Right up your street.", ticket:false, status:"" },
+        { id:"g41", cat:"exp", title:"Tombstoning", note:"Jumping from the rocks into the bay. Only where you have checked the depth and the tide is well in, it is how people get hurt otherwise.", ticket:false, status:"" }
+      ]
+    },
+
+    { id:"j3", type:"journey", mode:"ferry", from:"Devon", to:"France (Normandy / Paris)",
+      date:"2026-07-03", duration:"see options", operator:"Decision needed",
+      status:"idea",
+      note:"Note: the cross-Channel ferry moved from Weymouth to Poole (Condor's old Weymouth route has gone). Three ways to do this leg are below. Pick one and the times and bookings can be firmed up.",
+      options:[
+        { label:"A · Fly, no car", detail:"Drive Devon to Bristol Airport (about 1h 30m), then easyJet Bristol to Paris CDG (about 1h 20m, roughly 20 flights a week). Do Paris first and treat Normandy as a long day trip or a train side-trip from Bayeux.",
+          pros:"Fastest. No ferry or car needed.", cons:"Normandy is awkward without a car, and Mont Saint-Michel especially so." },
+        { label:"B · Ferry with your own car", detail:"Drive Devon to Poole (about 1h 45m), then Brittany Ferries Poole to Cherbourg (about 4h 45m, daily in summer) with the car aboard. Full Normandy road trip, then drive to Paris.",
+          pros:"Full freedom in Normandy, with the car throughout.", cons:"Getting the car home before Barcelona is the problem. Works best if France is the focus and Barcelona is reconsidered." },
+        { label:"C · Car-free across, hire in Normandy", detail:"Reach Paris car-free (Eurostar from London, or fly Bristol to Paris), pick up a hire car for a quick Normandy loop based in Bayeux, drop it, then carry on by train or air.",
+          pros:"Normandy flexibility without taking a car across the Channel or down to Spain.", cons:"One car hire to arrange and return." }
+      ],
+      decision:"" },
+
+    { id:"s3", type:"stop", country:"France", flag:"Normandy",
+      place:"(Normandy)", region:"A night in Bayeux, or just a drive-through. Not decided yet.",
+      dateStart:"2026-07-03", dateEnd:"2026-07-04",
+      lodgingName:"To be decided", lodgingType:"Hotel in Bayeux", lodgingStatus:"idea",
+      summary:"Still deciding: a night in Bayeux for the D-Day coast and Mont Saint-Michel, or just a drive through on the way to Paris.",
+      guide:[
+        { id:"g14", cat:"see", title:"The American sector", note:"Utah Beach, Pointe du Hoc, Omaha Beach with the Les Braves sculpture, and Sainte-Mere-Eglise with the Airborne Museum.", ticket:true, status:"idea" },
+        { id:"g15", cat:"see", title:"Normandy American Cemetery, Colleville-sur-Mer", note:"Free to visit, open 9 to 5, set above Omaha Beach. Worth an unhurried hour.", ticket:false, status:"" },
+        { id:"g16", cat:"see", title:"Bayeux Tapestry & Arromanches", note:"The 900-year-old tapestry in town, and the remains of the Mulberry harbour out at Arromanches.", ticket:true, status:"idea" },
+        { id:"g17", cat:"see", title:"Mont Saint-Michel", note:"About 1h 15m from Bayeux. Abbey entry is around 16 euros, open roughly 9 to 7 in summer. Book online to skip the queue, and check the tide times.", ticket:true, status:"tobook" },
+        { id:"g18", cat:"eat", title:"Eat Normandy", note:"Camembert, cider and Calvados, moules, and the Bayeux market for everything in between.", ticket:false, status:"" }
+      ]
+    },
+
+    { id:"j4", type:"journey", mode:"train", from:"Bayeux", to:"Paris",
+      date:"2026-07-04", duration:"approx 2h 15m by train (or about 3h driving)", operator:"SNCF to Paris Saint-Lazare",
+      status:"idea", note:"Direct trains run Bayeux to Paris Saint-Lazare. If you took the car across, it is a straight drive in instead." },
+
+    { id:"s4", type:"stop", country:"France", flag:"France",
+      place:"Paris", region:"Le Marais or Saint-Germain",
+      dateStart:"2026-07-04", dateEnd:"2026-07-07",
+      lodgingName:"Hôtel Serotel Lutèce", lodgingType:"5th, Latin Quarter", lodgingStatus:"tobook", lodgingUrl:"https://www.booking.com/hotel/fr/serotellutece.html?label=gen173bo-10CAEoggI46AdIM1gDaI4CiAEBmAEzuAEHyAEM2AED6AEB-AEBiAIBmAIhqAIBuAL094DRBsACAdICJGJhOTEzYmRmLWIzNmUtNDljNS1iOGM5LWJkMDYwZTdjNjVkNNgCAeACAQ&aid=304142&ucfs=1&checkin=2026-07-03&checkout=2026-07-06&dest_id=-1456928&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Bprice%3DUSD-min-280-1%3Broomfacility%3D38%3Bclass%3D4%3Breview_score%3D90%3Breview_score%3D80&srpvid=290b6702e53a01e6&srepoch=1780498892&matching_block_id=5127602_88550588_0_2_0&atlas_src=sr_iw_title",
+      summary:"Three nights. Book the timed-entry tickets first, then plan the rest around them.",
+      guide:[
+        { id:"g20", cat:"see", title:"Eiffel Tower", note:"Summit tickets sell out, especially in the evening. Book ahead.", ticket:true, status:"tobook" },
+        { id:"g21", cat:"see", title:"The Louvre", note:"Timed entry is mandatory, and it is closed on Tuesdays.", ticket:true, status:"tobook" },
+        { id:"g22", cat:"see", title:"Sainte-Chapelle & Musee d'Orsay", note:"The Sainte-Chapelle stained glass is the best interior in Paris and slots sell out on bright summer days. Orsay closes Mondays. Both worth pre-booking.", ticket:true, status:"tobook" },
+        { id:"g23", cat:"see", title:"Versailles", note:"A half-day trip. Book the palace, lines are brutal without it, and it closes on Mondays. Notre-Dame has reopened and is free to walk in.", ticket:true, status:"idea" },
+        { id:"g24", cat:"see", title:"Just wander", note:"Montmartre and Sacre-Coeur, the Marais, the Seine, the Jardin du Luxembourg, Canal Saint-Martin. No tickets, all worth it.", ticket:false, status:"" },
+        { id:"g25", cat:"eat", title:"A proper bistro dinner", note:"The good small rooms book up, so reserve. Croissants from a real boulangerie, cheese and wine, and steer clear of the menu touristique spots right beside the big sights.", ticket:false, status:"" },
+        { id:"g26", cat:"exp", title:"The Tower at night", note:"It sparkles for five minutes on the hour after dark. Time an evening Seine stroll to catch it.", ticket:false, status:"" }
+      ]
+    },
+
+    { id:"j5", type:"journey", mode:"plane", from:"Paris", to:"Barcelona",
+      date:"2026-07-07", duration:"about 1h 45m to fly, or about 6h 40m by direct TGV", operator:"Vueling / easyJet, or SNCF high-speed",
+      status:"tobook", note:"Flying is quickest. The direct TGV is slower but city-centre to city-centre and rather civilised." },
+
+    { id:"s5", type:"stop", country:"Spain", flag:"Catalonia",
+      place:"Barcelona", region:"Eixample or El Born",
+      dateStart:"2026-07-07", dateEnd:"2026-07-10",
+      lodgingName:"To be decided", lodgingType:"Hotel / apartment", lodgingStatus:"tobook",
+      summary:"Gothic alleys, Gaudi, and a beach, all within walking distance. 2026 is the Gaudi centenary, so the big tickets go fast.",
+      guide:[
+        { id:"g28", cat:"see", title:"Sagrada Familia", note:"Timed tickets sell out days ahead in 2026, so book early. Allow two to three hours.", ticket:true, status:"tobook" },
+        { id:"g29", cat:"see", title:"Park Guell & Casa Batllo", note:"Park Guell is timed-entry and sells out too. Casa Batllo (or La Pedrera) is cheaper booked online. Go early or after 5pm for fewer crowds.", ticket:true, status:"tobook" },
+        { id:"g30", cat:"see", title:"The old city", note:"The Gothic Quarter and cathedral, then El Born with Santa Maria del Mar and the Picasso Museum.", ticket:false, status:"" },
+        { id:"g31", cat:"see", title:"Montjuic & the Bunkers", note:"Cable car up Montjuic for the castle and gardens, and the Bunkers del Carmel for the best sunset view in the city.", ticket:true, status:"idea" },
+        { id:"g32", cat:"eat", title:"Tapas done right", note:"Hop bars in El Born, Gracia, Poble-sec or Sant Antoni. Pan amb tomaquet, patatas bravas, jamon, and vermut in an old bodega.", ticket:false, status:"" },
+        { id:"g33", cat:"eat", title:"Paella, properly", note:"Go to a sit-down place in Barceloneta near the beach, not La Rambla. Avoid eating on La Rambla generally.", ticket:false, status:"" }
+      ]
+    },
+
+    { id:"j6", type:"journey", mode:"plane", from:"Barcelona", to:"London",
+      date:"2026-07-10", duration:"about 2h", operator:"BA / Vueling / easyJet into LHR or LGW",
+      status:"tobook", note:"Then onward to Prestwood for the final few days." },
+
+    { id:"s6", type:"stop", country:"England", flag:"United Kingdom",
+      place:"London & Home", region:"Back at Prestwood",
+      dateStart:"2026-07-10", dateEnd:"2026-07-15",
+      lodgingName:"Home, Prestwood", lodgingType:"Your house", lodgingStatus:"booked",
+      summary:"A few days back in London to see whatever you missed, and slow down before she flies.",
+      guide:[
+        { id:"g35", cat:"see", title:"The London you skipped", note:"Galleries, markets, a show, Greenwich, a Thames walk.", ticket:true, status:"idea" },
+        { id:"g36", cat:"eat", title:"Home comforts", note:"A Chilterns Sunday roast, a curry, and a final cream tea.", ticket:false, status:"" },
+        { id:"g37", cat:"exp", title:"Go slow", note:"Last few days for not rushing.", ticket:false, status:"" }
+      ]
+    },
+
+    { id:"j7", type:"journey", mode:"plane", from:"London (LHR)", to:"Nashville (BNA)",
+      date:"2026-07-15", depart:"08:15", arrive:"17:03", duration:"14h 48m", operator:"JetBlue",
+      status:"booked", note:"One stop at JFK (3h 55m)." }
+  ]
+};
+
+/* ============================================================
+   STATE
+============================================================ */
+const KEY = "grandtour.v7";
+let state = load() || clone(SEED);
+let expanded = new Set(state.items.filter(i=>i.type==="stop").map(i=>i.id)); // start expanded
+let bookFilter = false;
+
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+function load(){ try{ const r=localStorage.getItem(KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ console.warn("save failed",e); }
+  if(window.cloud && window.cloud.save){ window.cloud.save(state); }
+}
+window.getState=function(){ return state; };
+window.applyRemote=function(remote){
+  if(!remote || !remote.items) return;
+  state=remote;
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  render();
+};
+function uid(p){ return p + Math.random().toString(36).slice(2,8); }
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function parseISO(s){ if(!s) return null; const p=s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function fmtDay(s){ const d=parseISO(s); if(!d) return ""; return DAYS[d.getDay()]+" "+d.getDate()+" "+MONTHS[d.getMonth()]; }
+function fmtRange(a,b){
+  const da=parseISO(a), db=parseISO(b);
+  if(!da) return "";
+  if(!db || a===b) return fmtDay(a)+" "+da.getFullYear();
+  const yr = (da.getFullYear()===db.getFullYear()) ? " "+db.getFullYear() : "";
+  let n = Math.round((db-da)/86400000);
+  const nights = n>0 ? "  ·  "+n+(n===1?" night":" nights") : "";
+  return fmtDay(a)+" – "+fmtDay(b)+yr+nights;
+}
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function statusTag(st){
+  if(st==="booked") return '<span class="tag booked">Booked</span>';
+  if(st==="tobook") return '<span class="tag tobook">To book</span>';
+  if(st==="idea") return '<span class="tag idea">Idea</span>';
+  return "";
+}
+
+/* ============================================================
+   STATS
+============================================================ */
+function renderStats(){
+  const stops = state.items.filter(i=>i.type==="stop");
+  const allDates = state.items.flatMap(i=> [i.date, i.dateStart, i.dateEnd]).filter(Boolean).map(parseISO).filter(Boolean);
+  let days="–";
+  if(allDates.length){ const min=new Date(Math.min(...allDates)), max=new Date(Math.max(...allDates)); days=Math.round((max-min)/86400000)+1; }
+  const countries = new Set(stops.map(s=>s.country).filter(Boolean)).size;
+  let toBook=0;
+  state.items.forEach(i=>{
+    if(i.type==="journey" && (i.status==="tobook")) toBook++;
+    if(i.type==="stop"){ if(i.lodgingStatus==="tobook") toBook++; (i.guide||[]).forEach(g=>{ if(g.status==="tobook"||(g.ticket && g.status!=="booked")) toBook++; }); }
+  });
+  const el=document.getElementById("stats");
+  el.innerHTML =
+    stat(days,"Days") + stat(countries,"Countries") + stat(stops.length,"Stops") + stat(toBook,"To sort");
+}
+function stat(n,l){ return '<div class="stat"><div class="num">'+n+'</div><div class="lbl">'+l+'</div></div>'; }
+
+/* ============================================================
+   RENDER TIMELINE
+============================================================ */
+function render(){
+  document.getElementById("eyebrow").innerHTML = state.meta.eyebrow || "";
+  document.getElementById("title").innerHTML = state.meta.title || "";
+  document.getElementById("subtitle").innerHTML = state.meta.subtitle || "";
+  renderStats();
+
+  const tl = document.getElementById("timeline");
+  tl.innerHTML = "";
+
+  let visible = state.items;
+  if(bookFilter){
+    visible = state.items.filter(i=>{
+      if(i.type==="journey") return i.status==="tobook" || i.status==="booked";
+      const lodge = i.lodgingStatus==="tobook" || i.lodgingStatus==="booked";
+      const g = (i.guide||[]).some(x=>x.ticket || x.status==="tobook" || x.status==="booked");
+      return lodge || g;
+    });
+  }
+
+  if(!visible.length){ tl.innerHTML='<div class="empty">Nothing here yet. Add a stop or a journey to begin.</div>'; return; }
+
+  visible.forEach(item=>{
+    tl.appendChild( item.type==="stop" ? stopNode(item) : journeyNode(item) );
+  });
+}
+
+function node(inner, iconKey, openable, id){
+  const n=document.createElement("div");
+  n.className="node"+(openable && expanded.has(id)?" open":"");
+  n.dataset.id=id||"";
+  n.innerHTML = '<span class="dot">'+ICON[iconKey]+'</span>'+inner;
+  return n;
+}
+
+function stopNode(s){
+  const guide = (s.guide||[]).filter(g=> !bookFilter || g.ticket || g.status==="tobook" || g.status==="booked" );
+  let groups="";
+  CAT_ORDER.forEach(cat=>{
+    const items = guide.filter(g=>g.cat===cat);
+    if(!items.length) return;
+    groups += '<div class="grp"><div class="grp-title">'+CAT[cat]+'<span class="gl"></span></div>'+
+      items.map(g=>guideRow(s.id,g)).join("")+'</div>';
+  });
+  const addRow = '<div class="add-item-row"><button class="icon-btn" data-act="add-guide" data-stop="'+s.id+'">+ Add a tip</button></div>';
+  let staysHtml="";
+  if(s.stays && s.stays.length){
+    staysHtml = '<div class="grp"><div class="grp-title">Where to stay &middot; shortlist<span class="gl"></span></div><div class="rank-hint">Use the arrows to rank these. Changes show for both of you.</div><div class="stays">'+
+      s.stays.map((h,i)=>stayCard(h,i,s.id)).join("")+'</div></div>';
+  }
+
+  const inner =
+    '<div class="card">'+
+      '<div class="card-head" data-act="toggle" data-id="'+s.id+'">'+
+        '<div class="grow">'+
+          '<div class="place-kicker">'+(s.flag?'<span class="flag">'+esc(s.flag)+'</span>':'')+statusBadgeLodge(s)+'</div>'+
+          '<h2 class="place-name">'+esc(s.place)+'</h2>'+
+          (s.region?'<div class="place-region">'+esc(s.region)+'</div>':'')+
+          '<div class="dates">'+fmtRange(s.dateStart,s.dateEnd)+'</div>'+
+          (s.lodgingName?'<div class="lodging"><span class="lk">Stay</span>'+esc(s.lodgingName)+(s.lodgingType?' &middot; <i>'+esc(s.lodgingType)+'</i>':'')+(s.lodgingUrl?' <a class="lodge-go" href="'+esc(s.lodgingUrl)+'" target="_blank" rel="noopener" title="Open on Booking.com" aria-label="Open on Booking.com" onclick="event.stopPropagation()">'+ICON.go+'</a>':'')+'</div>':'')+
+          (s.summary?'<div class="summary">'+esc(s.summary)+'</div>':'')+
+        '</div>'+
+        '<span class="chev">'+ICON.chev+'</span>'+
+      '</div>'+
+      '<div class="body">'+groups+staysHtml+addRow+'</div>'+
+      '<div class="card-tools">'+
+        '<button class="icon-btn" data-act="edit-stop" data-id="'+s.id+'">Edit stop</button>'+
+        '<button class="icon-btn" data-act="up" data-id="'+s.id+'">&uarr;</button>'+
+        '<button class="icon-btn" data-act="down" data-id="'+s.id+'">&darr;</button>'+
+        '<button class="icon-btn danger" data-act="del" data-id="'+s.id+'">Remove</button>'+
+      '</div>'+
+    '</div>';
+  return node(inner,"stop",true,s.id);
+}
+function statusBadgeLodge(s){ return s.lodgingStatus?statusTag(s.lodgingStatus):""; }
+
+function stayCard(h,i,stopId){
+  const go = h.url?'<a class="stay-go" href="'+esc(h.url)+'" target="_blank" rel="noopener" title="Open on Booking.com" aria-label="Open on Booking.com">'+ICON.go+'</a>':'';
+  const ctrl = '<span class="rank-ctrl">'+
+    '<button class="rk" data-act="stay-up" data-stop="'+stopId+'" data-slug="'+h.slug+'" title="Move up" aria-label="Move up">&#9650;</button>'+
+    '<button class="rk" data-act="stay-down" data-stop="'+stopId+'" data-slug="'+h.slug+'" title="Move down" aria-label="Move down">&#9660;</button>'+
+  '</span>';
+  return '<div class="stay">'+
+    '<div class="stay-body">'+
+      '<div class="stay-head">'+ctrl+'<span class="stay-rank">'+(i+1)+'.</span><span class="stay-name">'+esc(h.name)+'</span><span class="stay-area">'+esc(h.area)+'</span>'+go+'</div>'+
+      '<div class="stay-meta"><span class="score-badge">'+esc(h.score)+'</span><span class="price-badge">'+esc(h.price)+'</span></div>'+
+      '<div class="pc-cols">'+
+        '<div class="good"><h5>Good</h5><ul>'+h.pros.map(p=>'<li>'+esc(p)+'</li>').join("")+'</ul></div>'+
+        '<div class="bad"><h5>Worth knowing</h5><ul>'+h.cons.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul></div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function guideRow(stopId,g){
+  const tags = (g.ticket?'<span class="tag ticket">Ticket</span>':'') + statusTag(g.status);
+  return '<div class="item">'+
+    '<div class="item-top"><span class="item-title">'+esc(g.title)+'</span> '+
+      (tags?'<span class="tags">'+tags+'</span>':'')+'</div>'+
+    (g.note?'<div class="item-note">'+esc(g.note)+'</div>':'')+
+    '<div class="mini">'+
+      '<button class="icon-btn" data-act="edit-guide" data-stop="'+stopId+'" data-gid="'+g.id+'">Edit</button>'+
+      '<button class="icon-btn danger" data-act="del-guide" data-stop="'+stopId+'" data-gid="'+g.id+'">Delete</button>'+
+    '</div></div>';
+}
+
+function journeyNode(j){
+  let optHtml="";
+  if(j.options && j.options.length){
+    optHtml = '<div class="options">'+ j.options.map(o=>
+      '<div class="opt"><h4>'+esc(o.label)+'</h4>'+
+        (o.detail?'<div class="od">'+esc(o.detail)+'</div>':'')+
+        '<div class="pc">'+
+          (o.pros?'<div class="pros"><span class="pcl">For</span> '+esc(o.pros)+'</div>':'')+
+          (o.cons?'<div class="cons"><span class="pcl">Against</span> '+esc(o.cons)+'</div>':'')+
+        '</div></div>'
+      ).join("")+'</div>'+
+      '<div class="decision"><span class="dl">Decision</span>'+(j.decision?esc(j.decision):'Not decided yet. Talk it through, then note it here.')+'</div>';
+  }
+  const meta=[];
+  if(j.date) meta.push("<b>"+fmtDay(j.date)+"</b>");
+  if(j.depart||j.arrive) meta.push((j.depart||"")+(j.arrive?" – "+j.arrive:""));
+  if(j.duration) meta.push(esc(j.duration));
+  if(j.operator) meta.push("<i>"+esc(j.operator)+"</i>");
+
+  const inner =
+    '<div class="journey">'+
+      '<span class="mode">'+(ICON[j.mode]||ICON.car)+'</span>'+
+      '<div class="jgrow">'+
+        '<div class="route">'+esc(j.from)+'<span class="arr">&rarr;</span>'+esc(j.to)+' '+
+          (j.status?'<span class="tags">'+statusTag(j.status)+'</span>':'')+'</div>'+
+        (meta.length?'<div class="jmeta">'+meta.join("  ·  ")+'</div>':'')+
+        (j.note?'<div class="jnote">'+esc(j.note)+'</div>':'')+
+        optHtml+
+        '<div class="jtools">'+
+          '<button class="icon-btn" data-act="edit-journey" data-id="'+j.id+'">Edit</button>'+
+          '<button class="icon-btn" data-act="up" data-id="'+j.id+'">&uarr;</button>'+
+          '<button class="icon-btn" data-act="down" data-id="'+j.id+'">&darr;</button>'+
+          '<button class="icon-btn danger" data-act="del" data-id="'+j.id+'">Remove</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  return node(inner,j.mode||"car",false,j.id);
+}
+
+/* ============================================================
+   EVENTS (delegation)
+============================================================ */
+document.getElementById("timeline").addEventListener("click", e=>{
+  const t=e.target.closest("[data-act]"); if(!t) return;
+  const act=t.dataset.act, id=t.dataset.id, stop=t.dataset.stop, gid=t.dataset.gid, slug=t.dataset.slug;
+  if(act==="toggle"){ const sid=t.dataset.id; if(expanded.has(sid)) expanded.delete(sid); else expanded.add(sid); render(); }
+  else if(act==="edit-stop") openStop(id);
+  else if(act==="edit-journey") openJourney(id);
+  else if(act==="add-guide") openGuide(stop,null);
+  else if(act==="edit-guide") openGuide(stop,gid);
+  else if(act==="del-guide"){ const s=find(stop); s.guide=s.guide.filter(g=>g.id!==gid); save(); render(); }
+  else if(act==="stay-up") moveStay(stop,slug,-1);
+  else if(act==="stay-down") moveStay(stop,slug,1);
+  else if(act==="up") moveItem(id,-1);
+  else if(act==="down") moveItem(id,1);
+  else if(act==="del"){ if(confirm("Remove this from the itinerary?")){ state.items=state.items.filter(i=>i.id!==id); save(); render(); } }
+});
+
+function moveStay(stopId,slug,dir){
+  const s=find(stopId); if(!s||!s.stays) return;
+  const i=s.stays.findIndex(x=>x.slug===slug); const ni=i+dir;
+  if(i<0||ni<0||ni>=s.stays.length) return;
+  const a=s.stays; [a[i],a[ni]]=[a[ni],a[i]]; save(); render();
+}
+
+function find(id){ return state.items.find(i=>i.id===id); }
+function moveItem(id,dir){
+  const idx=state.items.findIndex(i=>i.id===id); const ni=idx+dir;
+  if(ni<0||ni>=state.items.length) return;
+  const a=state.items; [a[idx],a[ni]]=[a[ni],a[idx]]; save(); render();
+}
+
+/* Toolbar */
+document.getElementById("addStop").onclick=()=>openStop(null);
+document.getElementById("addJourney").onclick=()=>openJourney(null);
+document.getElementById("editHead").onclick=openHead;
+document.getElementById("filterBook").onclick=function(){ bookFilter=!bookFilter; this.classList.toggle("on",bookFilter); this.textContent=bookFilter?"Show everything":"Show bookings only"; render(); };
+document.getElementById("expandAll").onclick=function(){
+  const stops=state.items.filter(i=>i.type==="stop").map(i=>i.id);
+  const allOpen = stops.every(id=>expanded.has(id));
+  if(allOpen){ expanded.clear(); this.textContent="Expand all"; } else { stops.forEach(id=>expanded.add(id)); this.textContent="Collapse all"; }
+  render();
+};
+document.getElementById("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="grand-tour-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+};
+document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=function(){
+  const f=this.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d&&d.items){ state=d; expanded=new Set(state.items.filter(i=>i.type==="stop").map(i=>i.id)); save(); render(); } else alert("That file does not look like a saved itinerary."); }catch(e){ alert("Could not read that file."); } };
+  r.readAsText(f); this.value="";
+};
+document.getElementById("resetBtn").onclick=()=>{ if(confirm("Reset to the original planned itinerary? Your edits will be lost unless you have exported them.")){ state=clone(SEED); expanded=new Set(state.items.filter(i=>i.type==="stop").map(i=>i.id)); save(); render(); } };
+
+/* ============================================================
+   MODALS
+============================================================ */
+const scrim=document.getElementById("scrim"), modal=document.getElementById("modal");
+function openModal(html){ modal.innerHTML=html; scrim.classList.add("show"); }
+function closeModal(){ scrim.classList.remove("show"); modal.innerHTML=""; }
+scrim.addEventListener("click", e=>{ if(e.target===scrim) closeModal(); });
+function val(id){ const e=document.getElementById(id); return e?e.value.trim():""; }
+function checked(id){ const e=document.getElementById(id); return e?e.checked:false; }
+
+function fld(id,label,value,type){ type=type||"text"; return '<div class="fld"><label>'+label+'</label><input id="'+id+'" type="'+type+'" value="'+esc(value||"")+'"></div>'; }
+function area(id,label,value){ return '<div class="fld"><label>'+label+'</label><textarea id="'+id+'">'+esc(value||"")+'</textarea></div>'; }
+function sel(id,label,value,opts){ return '<div class="fld"><label>'+label+'</label><select id="'+id+'">'+opts.map(o=>'<option value="'+o[0]+'"'+(o[0]===value?' selected':'')+'>'+o[1]+'</option>').join("")+'</select></div>'; }
+const STATUS_OPTS=[["","— none —"],["idea","Idea"],["tobook","To book"],["booked","Booked"]];
+
+/* Trip header */
+function openHead(){
+  openModal('<h3>Rename the trip</h3><p class="mhint">Top-of-page wording. HTML entities are fine.</p>'+
+    fld("h_eye","Eyebrow",state.meta.eyebrow)+
+    fld("h_title","Title",state.meta.title)+
+    fld("h_sub","Subtitle",state.meta.subtitle)+
+    actions("saveHead"));
+  document.getElementById("saveHead").onclick=()=>{ state.meta.eyebrow=val("h_eye"); state.meta.title=val("h_title"); state.meta.subtitle=val("h_sub"); save(); render(); closeModal(); };
+}
+
+/* Stop editor */
+function openStop(id){
+  const s = id?find(id):{ id:uid("s"), type:"stop", guide:[] , place:"", region:"", country:"", flag:"", dateStart:"", dateEnd:"", lodgingName:"", lodgingType:"", lodgingStatus:"", summary:"" };
+  openModal('<h3>'+(id?"Edit stop":"New stop")+'</h3>'+
+    fld("p_place","Place",s.place)+
+    fld("p_region","Subtitle / area",s.region)+
+    '<div class="two">'+fld("p_country","Country",s.country)+fld("p_flag","Label (small tag)",s.flag)+'</div>'+
+    '<div class="two">'+fld("p_ds","Arrive",s.dateStart,"date")+fld("p_de","Leave",s.dateEnd,"date")+'</div>'+
+    '<div class="two">'+fld("p_ln","Staying at",s.lodgingName)+fld("p_lt","Lodging type",s.lodgingType)+'</div>'+
+    sel("p_ls","Booking status",s.lodgingStatus,STATUS_OPTS)+
+    area("p_sum","Summary",s.summary)+
+    actions("saveStop"));
+  document.getElementById("saveStop").onclick=()=>{
+    s.place=val("p_place"); s.region=val("p_region"); s.country=val("p_country"); s.flag=val("p_flag");
+    s.dateStart=val("p_ds"); s.dateEnd=val("p_de"); s.lodgingName=val("p_ln"); s.lodgingType=val("p_lt");
+    s.lodgingStatus=val("p_ls"); s.summary=val("p_sum");
+    if(!id){ state.items.push(s); expanded.add(s.id); }
+    save(); render(); closeModal();
+  };
+}
+
+/* Guide item editor */
+function openGuide(stopId,gid){
+  const s=find(stopId);
+  const g = gid?s.guide.find(x=>x.id===gid):{ id:uid("g"), cat:"see", title:"", note:"", ticket:false, status:"" };
+  openModal('<h3>'+(gid?"Edit tip":"New tip")+'</h3>'+
+    sel("gi_cat","Category",g.cat,[["see",CAT.see],["eat",CAT.eat],["exp",CAT.exp],["note",CAT.note]])+
+    fld("gi_title","Title",g.title)+
+    area("gi_note","Note",g.note)+
+    '<div class="fld check"><input type="checkbox" id="gi_ticket"'+(g.ticket?" checked":"")+'><label>Needs a ticket</label></div>'+
+    sel("gi_status","Status",g.status,STATUS_OPTS)+
+    actions("saveGuide"));
+  document.getElementById("saveGuide").onclick=()=>{
+    g.cat=val("gi_cat"); g.title=val("gi_title"); g.note=val("gi_note"); g.ticket=checked("gi_ticket"); g.status=val("gi_status");
+    if(!gid){ s.guide=s.guide||[]; s.guide.push(g); }
+    save(); render(); closeModal();
+  };
+}
+
+/* Journey editor (incl. options) */
+function openJourney(id){
+  const j = id?find(id):{ id:uid("j"), type:"journey", mode:"car", from:"", to:"", date:"", depart:"", arrive:"", duration:"", operator:"", status:"", note:"", options:[], decision:"" };
+  j.options=j.options||[];
+  let optEditors = j.options.map((o,i)=>optEditor(o,i)).join("");
+  openModal('<h3>'+(id?"Edit journey":"New journey")+'</h3>'+
+    sel("j_mode","Mode",j.mode,[["plane","Plane"],["train","Train"],["car","Car"],["ferry","Ferry"],["coach","Coach / bus"]])+
+    '<div class="two">'+fld("j_from","From",j.from)+fld("j_to","To",j.to)+'</div>'+
+    fld("j_date","Date",j.date,"date")+
+    '<div class="two">'+fld("j_dep","Depart",j.depart)+fld("j_arr","Arrive",j.arrive)+'</div>'+
+    '<div class="two">'+fld("j_dur","Duration",j.duration)+fld("j_op","Operator / via",j.operator)+'</div>'+
+    sel("j_status","Status",j.status,STATUS_OPTS)+
+    area("j_note","Note",j.note)+
+    '<div class="fld"><label>Options (for a decision still to make)</label><div id="optList">'+optEditors+'</div>'+
+      '<button class="icon-btn" id="addOpt" type="button">+ Add an option</button></div>'+
+    fld("j_dec","Decision note",j.decision)+
+    actions("saveJourney"));
+  document.getElementById("addOpt").onclick=()=>{ const list=document.getElementById("optList"); const i=list.children.length; const div=document.createElement("div"); div.innerHTML=optEditor({label:"",detail:"",pros:"",cons:""},i); list.appendChild(div.firstChild); };
+  document.getElementById("saveJourney").onclick=()=>{
+    j.mode=val("j_mode"); j.from=val("j_from"); j.to=val("j_to"); j.date=val("j_date");
+    j.depart=val("j_dep"); j.arrive=val("j_arr"); j.duration=val("j_dur"); j.operator=val("j_op");
+    j.status=val("j_status"); j.note=val("j_note"); j.decision=val("j_dec");
+    const list=document.getElementById("optList"); const opts=[];
+    Array.from(list.querySelectorAll(".opt-edit")).forEach(box=>{
+      const get=c=>{ const e=box.querySelector("."+c); return e?e.value.trim():""; };
+      const label=get("oe_label");
+      if(label||get("oe_detail")) opts.push({ label:label, detail:get("oe_detail"), pros:get("oe_pros"), cons:get("oe_cons") });
+    });
+    j.options=opts;
+    if(!id) state.items.push(j);
+    save(); render(); closeModal();
+  };
+}
+function optEditor(o,i){
+  return '<div class="opt-edit">'+
+    '<button class="icon-btn danger rm" type="button" onclick="this.parentNode.remove()">remove</button>'+
+    '<div class="fld"><label>Label</label><input class="oe_label" value="'+esc(o.label)+'"></div>'+
+    '<div class="fld"><label>Detail</label><textarea class="oe_detail">'+esc(o.detail)+'</textarea></div>'+
+    '<div class="two"><div class="fld"><label>For</label><input class="oe_pros" value="'+esc(o.pros)+'"></div>'+
+    '<div class="fld"><label>Against</label><input class="oe_cons" value="'+esc(o.cons)+'"></div></div>'+
+  '</div>';
+}
+function actions(saveId){ return '<div class="modal-actions"><span></span><div class="right"><button class="btn" onclick="closeModalGlobal()" style="border-color:var(--line)">Cancel</button><button class="btn" id="'+saveId+'">Save</button></div></div>'; }
+window.closeModalGlobal=closeModal;
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+
+/* ============================================================
+   GO
+============================================================ */
+render();
+</script>
+
+<script type="module">
+  const cfg = window.FIREBASE_CONFIG || {};
+  const statusEl = document.getElementById("syncStatus");
+  const setStatus = (t,c)=>{ if(statusEl){ statusEl.textContent=t; statusEl.className="sync "+c; } };
+  if(!(cfg && cfg.apiKey && cfg.projectId)){
+    setStatus("Local only","off");
+  } else {
+    setStatus("Connecting","wait");
+    try{
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const { getFirestore, doc, onSnapshot, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const db = getFirestore(initializeApp(cfg));
+      const ref = doc(db, "grandtour", window.CLOUD_DOC || "trip");
+      let timer=null;
+      window.cloud = { save:(state)=>{
+        clearTimeout(timer);
+        timer=setTimeout(()=>{
+          setDoc(ref, { data: JSON.stringify(state), ts: Date.now() })
+            .then(()=>setStatus("Live","on"))
+            .catch(()=>setStatus("Sync error","off"));
+        }, 400);
+      }};
+      onSnapshot(ref, (snap)=>{
+        if(snap.metadata.hasPendingWrites) return;     // skip our own writes
+        if(snap.exists()){
+          try{ const remote = JSON.parse(snap.data().data); if(window.applyRemote) window.applyRemote(remote); }catch(e){}
+          setStatus("Live","on");
+        } else if(window.getState){                    // nothing online yet, seed it
+          window.cloud.save(window.getState());
+          setStatus("Live","on");
+        }
+      }, ()=> setStatus("Offline","off"));
+    }catch(e){
+      setStatus("Local only","off");
+    }
+  }
+</script>
+</body>
+</html>
