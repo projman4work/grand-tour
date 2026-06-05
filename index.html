@@ -290,7 +290,7 @@
   <header class="mast">
     <div class="eyebrow" id="eyebrow">An Itinerary</div>
     <h1 id="title">The Grand Tour</h1>
-    <div class="sub" id="subtitle">Nashville &middot; London &middot; Devon &middot; Paris &middot; Barcelona</div>
+    <div class="sub" id="subtitle">Nashville &middot; London &middot; Devon &middot; Paris &middot; South of France &middot; Barcelona</div>
     <div class="rule-orn">
       <span class="ln"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="12" cy="12" r="9"/><path d="M12 4l2.2 5.8L20 12l-5.8 2.2L12 20l-2.2-5.8L4 12l5.8-2.2z"/></svg>
@@ -365,113 +365,501 @@ const CAT_ORDER = ["see","eat","exp","note"];
    SEED ITINERARY  (researched May 2026 — all editable)
 ============================================================ */
 const SEED = {
-  meta:{
-    eyebrow:"Volume I",
-    title:"A <span class='amp'>+</span> B's First Grand Tour",
-    subtitle:"Nashville &middot; London &middot; Devon &middot; Paris &middot; Barcelona"
+  "meta": {
+    "eyebrow": "Volume I",
+    "title": "A <span class='amp'>+</span> B's First Grand Tour",
+    "subtitle": "Nashville &middot; London &middot; Devon &middot; Paris &middot; South of France &middot; Barcelona"
   },
-  items:[
-    { id:"j1", type:"journey", mode:"plane", from:"Nashville (BNA)", to:"London (LHR)",
-      date:"2026-06-28", depart:"08:40", arrive:"06:30 (+1)", duration:"15h 50m", operator:"JetBlue",
-      status:"booked", note:"One stop in Boston (6h 29m layover). Lands Heathrow on the morning of the 29th. Heathrow to Prestwood is about an hour by car." },
-
-    { id:"s1", type:"stop", country:"England", flag:"United Kingdom",
-      place:"London & The Chilterns", region:"Easing in at home, Prestwood",
-      dateStart:"2026-06-29", dateEnd:"2026-07-01",
-      lodgingName:"Home, Prestwood", lodgingType:"Your house", lodgingStatus:"booked",
-      summary:"Two days to recover from the overnight flight before heading west. Some London if there is time, with the Chilterns on the doorstep.",
-      guide:[
-        { id:"g1", cat:"see", title:"Roald Dahl Museum, Great Missenden", note:"Five minutes up the road and open until at least early 2027 before it closes to redevelop. The village trail takes in his grave, the petrol pumps from Danny, and Matilda's library.", ticket:true, status:"idea" },
-        { id:"g2", cat:"see", title:"A Chilterns walk", note:"The Ridgeway or South Bucks Way through the beech woods. Boug's Meadow in Prestwood for a quiet sit, and watch for red kites overhead.", ticket:false, status:"" },
-        { id:"g3", cat:"see", title:"London highlights", note:"South Bank stroll past Tate Modern and Borough Market, the British Museum (free), Westminster. The Tower of London and any West End show want booking ahead.", ticket:true, status:"idea" },
-        { id:"g39", cat:"see", title:"30 June: Eton & Windsor", note:"A possible day on the 30th: Eton (your old school) and Windsor, with an early-afternoon lunch at the Riverside in Thame if it comes off. Book the table ahead.", ticket:false, status:"tobook" },
-        { id:"g4", cat:"eat", title:"The village pubs", note:"The Nags Head was Dahl's local. The Cross Keys and The George do a proper Sunday roast.", ticket:false, status:"" },
-        { id:"g5", cat:"exp", title:"Keep day one light", note:"She arrives tired after the overnight flight. A short walk and an early dinner works better than a full London day.", ticket:false, status:"" },
-        { id:"g6", cat:"note", title:"Book the next leg now", note:"Lock in whichever France crossing you choose, plus Tower of London and any show, while you are sitting still.", ticket:false, status:"tobook" }
+  "items": [
+    {
+      "id": "j1",
+      "type": "journey",
+      "mode": "plane",
+      "from": "Nashville (BNA)",
+      "to": "London (LHR)",
+      "date": "2026-06-28",
+      "depart": "08:40",
+      "arrive": "06:30 (+1)",
+      "duration": "15h 50m",
+      "operator": "JetBlue",
+      "status": "booked",
+      "note": "One stop in Boston (6h 29m layover). Lands Heathrow on the morning of the 29th. Heathrow to Prestwood is about an hour by car."
+    },
+    {
+      "id": "s1",
+      "type": "stop",
+      "country": "England",
+      "flag": "United Kingdom",
+      "place": "London & The Chilterns",
+      "region": "Easing in at home, Prestwood",
+      "dateStart": "2026-06-29",
+      "dateEnd": "2026-07-01",
+      "lodgingName": "Home, Prestwood",
+      "lodgingType": "Your house",
+      "lodgingStatus": "booked",
+      "summary": "Two days to recover from the overnight flight before heading west. Some London if there is time, with the Chilterns on the doorstep.",
+      "guide": [
+        {
+          "id": "g1",
+          "cat": "see",
+          "title": "Roald Dahl Museum, Great Missenden",
+          "note": "Five minutes up the road and open until at least early 2027 before it closes to redevelop. The village trail takes in his grave, the petrol pumps from Danny, and Matilda's library.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g2",
+          "cat": "see",
+          "title": "A Chilterns walk",
+          "note": "The Ridgeway or South Bucks Way through the beech woods. Boug's Meadow in Prestwood for a quiet sit, and watch for red kites overhead.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g3",
+          "cat": "see",
+          "title": "London highlights",
+          "note": "South Bank stroll past Tate Modern and Borough Market, the British Museum (free), Westminster. The Tower of London and any West End show want booking ahead.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g39",
+          "cat": "see",
+          "title": "30 June: Eton & Windsor",
+          "note": "A possible day on the 30th: Eton (your old school) and Windsor, with an early-afternoon lunch at the Riverside in Thame if it comes off. Book the table ahead.",
+          "ticket": false,
+          "status": "tobook"
+        },
+        {
+          "id": "g4",
+          "cat": "eat",
+          "title": "The village pubs",
+          "note": "The Nags Head was Dahl's local. The Cross Keys and The George do a proper Sunday roast.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g5",
+          "cat": "exp",
+          "title": "Keep day one light",
+          "note": "She arrives tired after the overnight flight. A short walk and an early dinner works better than a full London day.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g6",
+          "cat": "note",
+          "title": "Book the next leg now",
+          "note": "Lock in whichever France crossing you choose, plus Tower of London and any show, while you are sitting still.",
+          "ticket": false,
+          "status": "tobook"
+        }
       ]
     },
-
-    { id:"j2", type:"journey", mode:"car", from:"Prestwood", to:"Babbacombe, Devon",
-      date:"2026-07-01", depart:"", arrive:"", duration:"approx 3h 30m – 4h", operator:"By car (or train to Teignmouth + taxi)",
-      status:"idea", note:"The lane down to the Cary Arms is famously steep and easy to miss. Take it slowly. By rail it is Teignmouth station then a short taxi." },
-
-    { id:"s2", type:"stop", country:"England", flag:"English Riviera",
-      place:"Cary Arms & Spa", region:"Babbacombe Bay, the English Riviera",
-      dateStart:"2026-07-01", dateEnd:"2026-07-03",
-      lodgingName:"Cary Arms & Spa", lodgingType:"Seaside inn", lodgingStatus:"booked",
-      summary:"A sheltered bay with red cliffs and a sea-facing spa, with the South West Coast Path from the door.",
-      guide:[
-        { id:"g7", cat:"see", title:"South West Coast Path", note:"The Babbacombe to Maidencombe stretch is one of Devon's prettiest cliff walks, straight from the door.", ticket:false, status:"" },
-        { id:"g8", cat:"see", title:"Babbacombe Cliff Railway", note:"A Victorian funicular down to the beach. Cheap, charming, and saves the climb.", ticket:true, status:"idea" },
-        { id:"g9", cat:"see", title:"Kents Cavern & Brixham", note:"Prehistoric caves at Kents Cavern, and the working fishing harbour at Brixham. Babbacombe Model Village is close by too.", ticket:true, status:"idea" },
-        { id:"g10", cat:"eat", title:"Devon cream tea", note:"Scones, clotted cream and jam. The Devon way is cream first, then jam.", ticket:false, status:"" },
-        { id:"g11", cat:"eat", title:"Brixham seafood & local cider", note:"Brixham lands some of the best catch in the country, minutes away. The Cary Arms kitchen uses a lot of local produce.", ticket:false, status:"" },
-        { id:"g12", cat:"exp", title:"The spa", note:"Waterfall hydrotherapy pool with sea views, sauna and steam. Treatments book up, so reserve before you arrive.", ticket:true, status:"tobook" },
-        { id:"g13", cat:"exp", title:"Out on the water", note:"Kayaks and paddleboards in the bay, or drinks on the terrace at sunset.", ticket:false, status:"" },
-        { id:"g40", cat:"exp", title:"Swim the bay", note:"Open-water swim across Babbacombe Bay, clear water and sheltered. Right up your street.", ticket:false, status:"" },
-        { id:"g41", cat:"exp", title:"Tombstoning", note:"Jumping from the rocks into the bay. Only where you have checked the depth and the tide is well in, it is how people get hurt otherwise.", ticket:false, status:"" }
+    {
+      "id": "j2",
+      "type": "journey",
+      "mode": "car",
+      "from": "Prestwood",
+      "to": "Babbacombe, Devon",
+      "date": "2026-07-01",
+      "depart": "",
+      "arrive": "",
+      "duration": "approx 3h 30m – 4h",
+      "operator": "By car (or train to Teignmouth + taxi)",
+      "status": "idea",
+      "note": "The lane down to the Cary Arms is famously steep and easy to miss. Take it slowly. By rail it is Teignmouth station then a short taxi."
+    },
+    {
+      "id": "s2",
+      "type": "stop",
+      "country": "England",
+      "flag": "English Riviera",
+      "place": "Cary Arms & Spa",
+      "region": "Babbacombe Bay, the English Riviera",
+      "dateStart": "2026-07-01",
+      "dateEnd": "2026-07-03",
+      "lodgingName": "Cary Arms & Spa",
+      "lodgingType": "Seaside inn",
+      "lodgingStatus": "booked",
+      "summary": "A sheltered bay with red cliffs and a sea-facing spa, with the South West Coast Path from the door.",
+      "guide": [
+        {
+          "id": "g7",
+          "cat": "see",
+          "title": "South West Coast Path",
+          "note": "The Babbacombe to Maidencombe stretch is one of Devon's prettiest cliff walks, straight from the door.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g8",
+          "cat": "see",
+          "title": "Babbacombe Cliff Railway",
+          "note": "A Victorian funicular down to the beach. Cheap, charming, and saves the climb.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g9",
+          "cat": "see",
+          "title": "Kents Cavern & Brixham",
+          "note": "Prehistoric caves at Kents Cavern, and the working fishing harbour at Brixham. Babbacombe Model Village is close by too.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g10",
+          "cat": "eat",
+          "title": "Devon cream tea",
+          "note": "Scones, clotted cream and jam. The Devon way is cream first, then jam.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g12",
+          "cat": "exp",
+          "title": "The spa",
+          "note": "Waterfall hydrotherapy pool with sea views, sauna and steam. Treatments book up, so reserve before you arrive.",
+          "ticket": true,
+          "status": "tobook"
+        },
+        {
+          "id": "g13",
+          "cat": "exp",
+          "title": "Out on the water",
+          "note": "Kayaks and paddleboards in the bay, or drinks on the terrace at sunset.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g40",
+          "cat": "exp",
+          "title": "Swim the bay",
+          "note": "Open-water swim across Babbacombe Bay, clear water and sheltered. Right up your street.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g41",
+          "cat": "exp",
+          "title": "Tombstoning",
+          "note": "Jumping from the rocks into the bay. Only where you have checked the depth and the tide is well in, it is how people get hurt otherwise.",
+          "ticket": false,
+          "status": ""
+        }
       ]
     },
-
-    { id:"j3", type:"journey", mode:"plane", from:"Devon", to:"Paris (CDG)",
-      date:"2026-07-03", duration:"approx 5h door to door", operator:"CrossCountry train + A1 Airport Flyer + easyJet",
-      status:"idea",
-      note:"Normandy dropped, straight to Paris. Plan: get dropped at Torquay station for a direct CrossCountry train to Bristol Temple Meads (about 1h 45m, around 5 direct services a day, no change), then the A1 Airport Flyer bus to Bristol Airport (about 30 to 40 min, every few minutes). easyJet is the only nonstop Bristol to Paris and flies to CDG; the midday departure (around 12:57, into CDG mid-afternoon) fits best. Aim to leave Torquay by about 08:00. The route is not daily, so confirm the flight runs on Fri 3 July when booking." },
-
-    { id:"s4", type:"stop", country:"France", flag:"France",
-      place:"Paris", region:"Le Marais or Saint-Germain",
-      dateStart:"2026-07-03", dateEnd:"2026-07-07",
-      lodgingName:"Hôtel Serotel Lutèce", lodgingType:"5th, Latin Quarter", lodgingStatus:"tobook", lodgingUrl:"https://www.booking.com/hotel/fr/serotellutece.html?label=gen173bo-10CAEoggI46AdIM1gDaI4CiAEBmAEzuAEHyAEM2AED6AEB-AEBiAIBmAIhqAIBuAL094DRBsACAdICJGJhOTEzYmRmLWIzNmUtNDljNS1iOGM5LWJkMDYwZTdjNjVkNNgCAeACAQ&aid=304142&ucfs=1&checkin=2026-07-03&checkout=2026-07-06&dest_id=-1456928&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Bprice%3DUSD-min-280-1%3Broomfacility%3D38%3Bclass%3D4%3Breview_score%3D90%3Breview_score%3D80&srpvid=290b6702e53a01e6&srepoch=1780498892&matching_block_id=5127602_88550588_0_2_0&atlas_src=sr_iw_title",
-      summary:"Four nights. Book the timed-entry tickets first, then plan the rest around them.",
-      guide:[
-        { id:"g20", cat:"see", title:"Eiffel Tower", note:"Summit tickets sell out, especially in the evening. Book ahead.", ticket:true, status:"tobook" },
-        { id:"g21", cat:"see", title:"The Louvre", note:"Timed entry is mandatory, and it is closed on Tuesdays.", ticket:true, status:"tobook" },
-        { id:"g22", cat:"see", title:"Sainte-Chapelle & Musee d'Orsay", note:"The Sainte-Chapelle stained glass is the best interior in Paris and slots sell out on bright summer days. Orsay closes Mondays. Both worth pre-booking.", ticket:true, status:"tobook" },
-        { id:"g23", cat:"see", title:"Versailles", note:"A half-day trip. Book the palace, lines are brutal without it, and it closes on Mondays. Notre-Dame has reopened and is free to walk in.", ticket:true, status:"idea" },
-        { id:"g24", cat:"see", title:"Just wander", note:"Montmartre and Sacre-Coeur, the Marais, the Seine, the Jardin du Luxembourg, Canal Saint-Martin. No tickets, all worth it.", ticket:false, status:"" },
-        { id:"g25", cat:"eat", title:"A proper bistro dinner", note:"The good small rooms book up, so reserve. Croissants from a real boulangerie, cheese and wine, and steer clear of the menu touristique spots right beside the big sights.", ticket:false, status:"" },
-        { id:"g26", cat:"exp", title:"The Tower at night", note:"It sparkles for five minutes on the hour after dark. Time an evening Seine stroll to catch it.", ticket:false, status:"" }
+    {
+      "id": "j3",
+      "type": "journey",
+      "mode": "plane",
+      "from": "Devon",
+      "to": "Paris (CDG)",
+      "date": "2026-07-03",
+      "duration": "approx 5h door to door",
+      "operator": "CrossCountry train + A1 Airport Flyer + easyJet",
+      "status": "idea",
+      "note": "Normandy dropped, straight to Paris. Plan: get dropped at Torquay station for a direct CrossCountry train to Bristol Temple Meads (about 1h 45m, around 5 direct services a day, no change), then the A1 Airport Flyer bus to Bristol Airport (about 30 to 40 min, every few minutes). easyJet is the only nonstop Bristol to Paris and flies to CDG; the midday departure (around 12:57, into CDG mid-afternoon) fits best. Aim to leave Torquay by about 08:00. The route is not daily, so confirm the flight runs on Fri 3 July when booking."
+    },
+    {
+      "id": "s4",
+      "type": "stop",
+      "country": "France",
+      "flag": "France",
+      "place": "Paris",
+      "region": "Le Marais or Saint-Germain",
+      "dateStart": "2026-07-03",
+      "dateEnd": "2026-07-06",
+      "lodgingName": "Hôtel Serotel Lutèce",
+      "lodgingType": "5th, Latin Quarter",
+      "lodgingStatus": "tobook",
+      "lodgingUrl": "https://www.booking.com/hotel/fr/serotellutece.html?label=gen173bo-10CAEoggI46AdIM1gDaI4CiAEBmAEzuAEHyAEM2AED6AEB-AEBiAIBmAIhqAIBuAL094DRBsACAdICJGJhOTEzYmRmLWIzNmUtNDljNS1iOGM5LWJkMDYwZTdjNjVkNNgCAeACAQ&aid=304142&ucfs=1&checkin=2026-07-03&checkout=2026-07-06&dest_id=-1456928&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Bprice%3DUSD-min-280-1%3Broomfacility%3D38%3Bclass%3D4%3Breview_score%3D90%3Breview_score%3D80&srpvid=290b6702e53a01e6&srepoch=1780498892&matching_block_id=5127602_88550588_0_2_0&atlas_src=sr_iw_title",
+      "summary": "Three nights. Book the timed-entry tickets first, then plan the rest around them.",
+      "guide": [
+        {
+          "id": "g20",
+          "cat": "see",
+          "title": "Eiffel Tower",
+          "note": "Summit tickets sell out, especially in the evening. Book ahead.",
+          "ticket": true,
+          "status": "tobook"
+        },
+        {
+          "id": "g21",
+          "cat": "see",
+          "title": "The Louvre",
+          "note": "Timed entry is mandatory, and it is closed on Tuesdays.",
+          "ticket": true,
+          "status": "tobook"
+        },
+        {
+          "id": "g22",
+          "cat": "see",
+          "title": "Sainte-Chapelle & Musee d'Orsay",
+          "note": "The Sainte-Chapelle stained glass is the best interior in Paris and slots sell out on bright summer days. Orsay closes Mondays. Both worth pre-booking.",
+          "ticket": true,
+          "status": "tobook"
+        },
+        {
+          "id": "g23",
+          "cat": "see",
+          "title": "Versailles",
+          "note": "A half-day trip. Book the palace, lines are brutal without it, and it closes on Mondays. Notre-Dame has reopened and is free to walk in.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g24",
+          "cat": "see",
+          "title": "Just wander",
+          "note": "Montmartre and Sacre-Coeur, the Marais, the Seine, the Jardin du Luxembourg, Canal Saint-Martin. No tickets, all worth it.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g25",
+          "cat": "eat",
+          "title": "A proper bistro dinner",
+          "note": "The good small rooms book up, so reserve. Croissants from a real boulangerie, cheese and wine, and steer clear of the menu touristique spots right beside the big sights.",
+          "ticket": false,
+          "status": ""
+        }
       ]
     },
-
-    { id:"j5", type:"journey", mode:"plane", from:"Paris", to:"Barcelona",
-      date:"2026-07-07", duration:"about 1h 45m to fly, or about 6h 40m by direct TGV", operator:"Vueling / easyJet, or SNCF high-speed",
-      status:"tobook", note:"Flying is quickest. The direct TGV is slower but city-centre to city-centre and rather civilised." },
-
-    { id:"s5", type:"stop", country:"Spain", flag:"Catalonia",
-      place:"Barcelona", region:"Eixample or El Born",
-      dateStart:"2026-07-07", dateEnd:"2026-07-10",
-      lodgingName:"To be decided", lodgingType:"Hotel / apartment", lodgingStatus:"tobook",
-      summary:"Gothic alleys, Gaudi, and a beach, all within walking distance. 2026 is the Gaudi centenary, so the big tickets go fast.",
-      guide:[
-        { id:"g28", cat:"see", title:"Sagrada Familia", note:"Timed tickets sell out days ahead in 2026, so book early. Allow two to three hours.", ticket:true, status:"tobook" },
-        { id:"g29", cat:"see", title:"Park Guell & Casa Batllo", note:"Park Guell is timed-entry and sells out too. Casa Batllo (or La Pedrera) is cheaper booked online. Go early or after 5pm for fewer crowds.", ticket:true, status:"tobook" },
-        { id:"g30", cat:"see", title:"The old city", note:"The Gothic Quarter and cathedral, then El Born with Santa Maria del Mar and the Picasso Museum.", ticket:false, status:"" },
-        { id:"g31", cat:"see", title:"Montjuic & the Bunkers", note:"Cable car up Montjuic for the castle and gardens, and the Bunkers del Carmel for the best sunset view in the city.", ticket:true, status:"idea" },
-        { id:"g32", cat:"eat", title:"Tapas done right", note:"Hop bars in El Born, Gracia, Poble-sec or Sant Antoni. Pan amb tomaquet, patatas bravas, jamon, and vermut in an old bodega.", ticket:false, status:"" },
-        { id:"g33", cat:"eat", title:"Paella, properly", note:"Go to a sit-down place in Barceloneta near the beach, not La Rambla. Avoid eating on La Rambla generally.", ticket:false, status:"" }
+    {
+      "id": "j5",
+      "type": "journey",
+      "mode": "train",
+      "from": "Paris",
+      "to": "South of France",
+      "date": "2026-07-06",
+      "duration": "about 3h30 to 5h by TGV, depending on town",
+      "operator": "SNCF TGV from Paris Gare de Lyon",
+      "status": "idea",
+      "note": "Direct TGVs run south from Paris Gare de Lyon; which station you get off at depends on the hotel — Sete/Montpellier for Frontignan, Nimes/Arles for the Camargue, or Saint-Raphael-Valescure for the Var coast (Saint-Aygulf, Saint-Raphael). Flying Paris to Nice or Montpellier then driving is the faster alternative for the far ends."
+    },
+    {
+      "id": "sR1",
+      "type": "stop",
+      "country": "France",
+      "flag": "South of France",
+      "place": "South of France",
+      "region": "Med coast — options from Frontignan & the Camargue across to the Var Riviera",
+      "dateStart": "2026-07-06",
+      "dateEnd": "2026-07-08",
+      "lodgingName": "",
+      "lodgingType": "",
+      "lodgingStatus": "tobook",
+      "summary": "Two nights of sun and beach on the way south, between Paris and Barcelona. Six hotels shortlisted across the south coast (from Frontignan near Montpellier to the Var Riviera) — pick your base and the arrival station follows.",
+      "stays": [
+        {
+          "slug": "petite-maison-de-plage",
+          "name": "La Petite Maison de Plage - Premiere Ligne",
+          "area": "Frontignan (Herault)",
+          "url": "https://www.booking.com/hotel/fr/petite-maison-de-plage-premiere-ligne.html?label=popunder-see-897583-click_destid-traintimesSE&aid=897583&ucfs=1&checkin=2026-07-06&checkout=2026-07-08&dest_id=-1472539&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Breview_score%3D80%3Breview_score%3D90%3Broomfacility%3D38%3Bht_beach%3D1%3Bclass%3D4%3Bclass%3D3%3Bprice%3DUSD-min-200-1%3Broomfacility%3D11&srpvid=2eef94eac6cf008e&srepoch=1780607830&matching_block_id=462047401_434107172_2_0_0&atlas_src=sr_iw_title",
+          "score": "",
+          "price": "",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "slug": "le-beau-site",
+          "name": "Le Beau Site",
+          "area": "Le Lavandou (Var)",
+          "url": "https://www.booking.com/hotel/fr/le-beau-site.html?label=popunder-see-897583-click_destid-traintimesSE&aid=897583&ucfs=1&checkin=2026-07-06&checkout=2026-07-07&dest_id=-1472539&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Breview_score%3D80%3Breview_score%3D90%3Broomfacility%3D38%3Bclass%3D4%3Bprice%3DUSD-min-200-1%3Bclass%3D3%3Bht_beach%3D1&srpvid=467b91dbdb730078&srepoch=1780607389&matching_block_id=2430005_340055338_2_34_0&atlas_src=sr_iw_title",
+          "score": "",
+          "price": "",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "slug": "le-cocon-de-sissy",
+          "name": "Le Cocon de Sissy",
+          "area": "Saintes-Maries-de-la-Mer (Camargue)",
+          "url": "https://www.booking.com/hotel/fr/le-cocon-de-sissy.html?label=popunder-see-897583-click_destid-traintimesSE&aid=897583&ucfs=1&checkin=2026-07-06&checkout=2026-07-07&dest_id=-1472539&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Breview_score%3D80%3Breview_score%3D90%3Broomfacility%3D38%3Bclass%3D4%3Bprice%3DUSD-min-200-1%3Bclass%3D3%3Bht_beach%3D1&srpvid=467b91dbdb730078&srepoch=1780607298&matching_block_id=1075106101_380085033_2_0_0&atlas_src=sr_iw_title",
+          "score": "",
+          "price": "",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "slug": "hotelcapriviera",
+          "name": "Hotel Cap Riviera",
+          "area": "Saint-Aygulf, Frejus (Var)",
+          "url": "https://www.booking.com/hotel/fr/hotelcapriviera.html?label=popunder-see-897583-click_destid-traintimesSE&aid=897583&ucfs=1&checkin=2026-07-06&checkout=2026-07-07&dest_id=-1472539&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Breview_score%3D80%3Breview_score%3D90%3Broomfacility%3D38%3Bclass%3D4%3Bprice%3DUSD-min-200-1%3Bclass%3D3%3Bht_beach%3D1&srpvid=467b91dbdb730078&srepoch=1780607210&matching_block_id=5089404_106497991_2_2_0&atlas_src=sr_iw_title",
+          "score": "",
+          "price": "",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "slug": "saint-aygulf",
+          "name": "Hotel Saint-Aygulf",
+          "area": "Saint-Aygulf, Frejus (Var)",
+          "url": "https://www.booking.com/hotel/fr/saint-aygulf.html?label=popunder-see-897583-click_destid-traintimesSE&aid=897583&ucfs=1&checkin=2026-07-06&checkout=2026-07-07&dest_id=-1472539&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=oos%3D1%3Breview_score%3D80%3Breview_score%3D90%3Broomfacility%3D38%3Bclass%3D4%3Bprice%3DUSD-min-200-1%3Bclass%3D3%3Bht_beach%3D1&srpvid=467b91dbdb730078&srepoch=1780607139&matching_block_id=5358415_88549099_2_42_0&atlas_src=sr_iw_title",
+          "score": "",
+          "price": "",
+          "pros": [],
+          "cons": []
+        },
+        {
+          "slug": "santa-margarita",
+          "name": "Hotel Santa Margarita",
+          "area": "Saint-Raphael (Var)",
+          "url": "https://www.booking.com/hotel/fr/santa-margarita.html?label=popunder-see-897583-click_destid-traintimesSE&aid=897583&ucfs=1&checkin=2026-07-06&checkout=2026-07-07&dest_id=-1472539&dest_type=city&group_adults=2&no_rooms=1&group_children=0&nflt=review_score%3D80%3Breview_score%3D90%3Broomfacility%3D38%3Boos%3D1%3Bprice%3DUSD-min-200-1&srpvid=467b91dbdb730078&srepoch=1780605949&matching_block_id=1402353101_412061333_2_1_0&atlas_src=sr_iw_title",
+          "score": "",
+          "price": "",
+          "pros": [],
+          "cons": []
+        }
+      ],
+      "guide": []
+    },
+    {
+      "id": "j5b",
+      "type": "journey",
+      "mode": "plane",
+      "from": "South of France",
+      "to": "Barcelona",
+      "date": "2026-07-08",
+      "duration": "about 1h30 to fly, or coastal train",
+      "operator": "Fly (Nice or Montpellier to Barcelona), or coastal train",
+      "status": "idea",
+      "note": "From the Var, quickest is to fly Nice to Barcelona (about 1h30). From the western towns (Frontignan, Camargue) you are closer to Montpellier airport or the coastal train toward the Spanish border."
+    },
+    {
+      "id": "s5",
+      "type": "stop",
+      "country": "Spain",
+      "flag": "Catalonia",
+      "place": "Barcelona",
+      "region": "Eixample or El Born",
+      "dateStart": "2026-07-08",
+      "dateEnd": "2026-07-11",
+      "lodgingName": "To be decided",
+      "lodgingType": "Hotel / apartment",
+      "lodgingStatus": "tobook",
+      "summary": "Gothic alleys, Gaudi, and a beach, all within walking distance. 2026 is the Gaudi centenary, so the big tickets go fast.",
+      "guide": [
+        {
+          "id": "g28",
+          "cat": "see",
+          "title": "Sagrada Familia",
+          "note": "Timed tickets sell out days ahead in 2026, so book early. Allow two to three hours.",
+          "ticket": true,
+          "status": "tobook"
+        },
+        {
+          "id": "g29",
+          "cat": "see",
+          "title": "Park Guell & Casa Batllo",
+          "note": "Park Guell is timed-entry and sells out too. Casa Batllo (or La Pedrera) is cheaper booked online. Go early or after 5pm for fewer crowds.",
+          "ticket": true,
+          "status": "tobook"
+        },
+        {
+          "id": "g30",
+          "cat": "see",
+          "title": "The old city",
+          "note": "The Gothic Quarter and cathedral, then El Born with Santa Maria del Mar and the Picasso Museum.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g31",
+          "cat": "see",
+          "title": "Montjuic & the Bunkers",
+          "note": "Cable car up Montjuic for the castle and gardens, and the Bunkers del Carmel for the best sunset view in the city.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g32",
+          "cat": "eat",
+          "title": "Tapas done right",
+          "note": "Hop bars in El Born, Gracia, Poble-sec or Sant Antoni. Pan amb tomaquet, patatas bravas, jamon, and vermut in an old bodega.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g33",
+          "cat": "eat",
+          "title": "Paella, properly",
+          "note": "Go to a sit-down place in Barceloneta near the beach, not La Rambla. Avoid eating on La Rambla generally.",
+          "ticket": false,
+          "status": ""
+        }
       ]
     },
-
-    { id:"j6", type:"journey", mode:"plane", from:"Barcelona", to:"London",
-      date:"2026-07-10", duration:"about 2h", operator:"BA / Vueling / easyJet into LHR or LGW",
-      status:"tobook", note:"Then onward to Prestwood for the final few days." },
-
-    { id:"s6", type:"stop", country:"England", flag:"United Kingdom",
-      place:"London & Home", region:"Back at Prestwood",
-      dateStart:"2026-07-10", dateEnd:"2026-07-15",
-      lodgingName:"Home, Prestwood", lodgingType:"Your house", lodgingStatus:"booked",
-      summary:"A few days back in London to see whatever you missed, and slow down before she flies.",
-      guide:[
-        { id:"g35", cat:"see", title:"The London you skipped", note:"Galleries, markets, a show, Greenwich, a Thames walk.", ticket:true, status:"idea" },
-        { id:"g36", cat:"eat", title:"Home comforts", note:"A Chilterns Sunday roast, a curry, and a final cream tea.", ticket:false, status:"" },
-        { id:"g37", cat:"exp", title:"Go slow", note:"Last few days for not rushing.", ticket:false, status:"" }
+    {
+      "id": "j6",
+      "type": "journey",
+      "mode": "plane",
+      "from": "Barcelona",
+      "to": "London",
+      "date": "2026-07-11",
+      "duration": "about 2h 10m",
+      "operator": "Wizz Air (Barcelona to London, confirm Luton vs Gatwick)",
+      "status": "tobook",
+      "note": "Morning Wizz Air out of Barcelona (around 09:30). Then onward to Prestwood for the final few days.",
+      "depart": "09:30"
+    },
+    {
+      "id": "s6",
+      "type": "stop",
+      "country": "England",
+      "flag": "United Kingdom",
+      "place": "London & Home",
+      "region": "Back at Prestwood",
+      "dateStart": "2026-07-11",
+      "dateEnd": "2026-07-15",
+      "lodgingName": "Home, Prestwood",
+      "lodgingType": "Your house",
+      "lodgingStatus": "booked",
+      "summary": "A few days back in London to see whatever you missed, and slow down before she flies.",
+      "guide": [
+        {
+          "id": "g35",
+          "cat": "see",
+          "title": "The London you skipped",
+          "note": "Galleries, markets, a show, Greenwich, a Thames walk.",
+          "ticket": true,
+          "status": "idea"
+        },
+        {
+          "id": "g36",
+          "cat": "eat",
+          "title": "Home comforts",
+          "note": "A Chilterns Sunday roast, a curry, and a final cream tea.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g37",
+          "cat": "exp",
+          "title": "Go slow",
+          "note": "Last few days for not rushing.",
+          "ticket": false,
+          "status": ""
+        }
       ]
     },
-
-    { id:"j7", type:"journey", mode:"plane", from:"London (LHR)", to:"Nashville (BNA)",
-      date:"2026-07-15", depart:"08:15", arrive:"17:03", duration:"14h 48m", operator:"JetBlue",
-      status:"booked", note:"One stop at JFK (3h 55m)." }
+    {
+      "id": "j7",
+      "type": "journey",
+      "mode": "plane",
+      "from": "London (LHR)",
+      "to": "Nashville (BNA)",
+      "date": "2026-07-15",
+      "depart": "08:15",
+      "arrive": "17:03",
+      "duration": "14h 48m",
+      "operator": "JetBlue",
+      "status": "booked",
+      "note": "One stop at JFK (3h 55m)."
+    }
   ]
 };
 
@@ -627,14 +1015,16 @@ function stayCard(h,i,stopId){
     '<button class="rk" data-act="stay-up" data-stop="'+stopId+'" data-slug="'+h.slug+'" title="Move up" aria-label="Move up">&#9650;</button>'+
     '<button class="rk" data-act="stay-down" data-stop="'+stopId+'" data-slug="'+h.slug+'" title="Move down" aria-label="Move down">&#9660;</button>'+
   '</span>';
+  const pros=(h.pros||[]), cons=(h.cons||[]);
+  const meta=(h.score||h.price)?'<div class="stay-meta">'+(h.score?'<span class="score-badge">'+esc(h.score)+'</span>':'')+(h.price?'<span class="price-badge">'+esc(h.price)+'</span>':'')+'</div>':'';
+  const pc=(pros.length||cons.length)?'<div class="pc-cols">'+
+        (pros.length?'<div class="good"><h5>Good</h5><ul>'+pros.map(p=>'<li>'+esc(p)+'</li>').join("")+'</ul></div>':'')+
+        (cons.length?'<div class="bad"><h5>Worth knowing</h5><ul>'+cons.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul></div>':'')+
+      '</div>':'';
   return '<div class="stay">'+
     '<div class="stay-body">'+
       '<div class="stay-head">'+ctrl+'<span class="stay-rank">'+(i+1)+'.</span><span class="stay-name">'+esc(h.name)+'</span><span class="stay-area">'+esc(h.area)+'</span>'+go+'</div>'+
-      '<div class="stay-meta"><span class="score-badge">'+esc(h.score)+'</span><span class="price-badge">'+esc(h.price)+'</span></div>'+
-      '<div class="pc-cols">'+
-        '<div class="good"><h5>Good</h5><ul>'+h.pros.map(p=>'<li>'+esc(p)+'</li>').join("")+'</ul></div>'+
-        '<div class="bad"><h5>Worth knowing</h5><ul>'+h.cons.map(c=>'<li>'+esc(c)+'</li>').join("")+'</ul></div>'+
-      '</div>'+
+      meta+pc+
     '</div>'+
   '</div>';
 }
