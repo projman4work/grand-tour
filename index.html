@@ -986,23 +986,121 @@ function render(){
   renderStats();
 
   const tl = document.getElementById("timeline");
-  tl.innerHTML = "";
+  const items = state.items || [];
+  const stops = items.filter(i=>i.type==="stop");
 
-  let visible = state.items;
-  if(bookFilter){
-    visible = state.items.filter(i=>{
-      if(i.type==="journey") return i.status==="tobook" || i.status==="booked";
-      const lodge = i.lodgingStatus==="tobook" || i.lodgingStatus==="booked";
-      const g = (i.guide||[]).some(x=>x.ticket || x.status==="tobook" || x.status==="booked");
-      return lodge || g;
-    });
+  // compact date / range for the day-by-day rows
+  const d1 = s => { const d=parseISO(s); return d ? DAYS[d.getDay()]+" "+d.getDate()+" "+MONTHS[d.getMonth()] : ""; };
+  const cr = (a,b) => {
+    const da=parseISO(a), db=parseISO(b);
+    if(!da) return "";
+    if(!db || a===b) return d1(a);
+    const same = da.getMonth()===db.getMonth();
+    return da.getDate()+(same?"":" "+MONTHS[da.getMonth()])+"–"+db.getDate()+" "+MONTHS[db.getMonth()];
+  };
+
+  const STYLE = `<style>
+    #timeline{max-width:840px;margin:0 auto;}
+    .dbd-sec{margin:0 0 40px;}
+    .dbd-h{font-family:"Cormorant Garamond",serif;font-size:29px;font-weight:600;color:var(--gold-deep,#9a7b2e);
+      border-bottom:1px solid var(--line,#e6e0d4);padding-bottom:8px;margin:0 0 16px;display:flex;align-items:center;gap:10px;}
+    .dbd-em{font-size:23px;line-height:1;}
+    .tk-list{display:grid;gap:9px;}
+    .tk{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line,#e6e0d4);border-radius:10px;}
+    .tk-box{flex:none;width:17px;height:17px;border:1.5px solid var(--gold-deep,#9a7b2e);border-radius:4px;margin-top:2px;}
+    .tk-name{font-weight:600;}
+    .tk-city{font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted,#9a8f78);margin-left:8px;}
+    .tk-note{font-size:13.5px;color:var(--ink-soft,#5b5446);margin-top:3px;}
+    .dbd-allset{color:var(--ink-soft,#5b5446);font-style:italic;}
+    .dbd-rows{display:grid;gap:3px;}
+    .dr{display:grid;grid-template-columns:118px 24px 1fr;align-items:center;gap:11px;padding:8px 6px;border-bottom:1px dashed var(--line,#ece7da);}
+    .dr-date{font-size:12.5px;color:var(--muted,#9a8f78);text-align:right;font-variant-numeric:tabular-nums;}
+    .dr-ic{width:23px;height:23px;color:var(--gold-deep,#9a7b2e);}
+    .dr-ic svg{width:21px;height:21px;}
+    .dr-ic.dot{font-size:10px;text-align:center;line-height:23px;}
+    .dr.travel{background:rgba(154,123,46,.06);border-radius:8px;border-bottom:none;}
+    .dr-route,.dr-place{font-weight:600;}
+    .dr-sub{display:block;font-size:12.5px;color:var(--ink-soft,#5b5446);font-weight:400;margin-top:1px;}
+    .city{border:1px solid var(--line,#e6e0d4);border-radius:12px;padding:18px 20px;margin:0 0 15px;}
+    .city-name{font-family:"Cormorant Garamond",serif;font-size:25px;margin:0;display:flex;align-items:center;gap:9px;}
+    .city-dates{font-size:12.5px;color:var(--muted,#9a8f78);margin-top:3px;}
+    .city-stay{margin-top:9px;font-size:14.5px;color:var(--ink-soft,#5b5446);}
+    .city-sum{margin-top:8px;font-size:13.5px;color:var(--ink-soft,#5b5446);}
+    .city-body{margin-top:15px;display:grid;gap:15px;}
+    .cg-t{font-size:10.5px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold-deep,#9a7b2e);margin-bottom:5px;}
+    .ci{padding:6px 0;border-top:1px solid var(--line,#f0ebdf);}
+    .ci-name{font-weight:600;}
+    .ci-note{font-size:13.5px;color:var(--ink-soft,#5b5446);margin-top:2px;}
+    .lodge-go{display:inline-block;width:15px;height:15px;vertical-align:-2px;color:var(--gold-deep,#9a7b2e);}
+    #addStop,#addJourney,#filterBook,#expandAll{display:none;}
+  </style>`;
+
+  // ---- 1) Tickets to book ----
+  const tix=[];
+  stops.forEach(s=>(s.guide||[]).forEach(g=>{ if(g.ticket && g.status==="tobook") tix.push({city:s.place, g:g}); }));
+  let tHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#127903;</span> Tickets to book</h2>';
+  if(!tix.length){
+    tHtml+='<div class="dbd-allset">All sorted &mdash; nothing left to book.</div>';
+  } else {
+    tHtml+='<div class="tk-list">'+ tix.map(t=>
+      '<div class="tk"><span class="tk-box"></span><div class="tk-txt">'+
+        '<span class="tk-name">'+esc(t.g.title)+'</span><span class="tk-city">'+esc(t.city)+'</span>'+
+        (t.g.note?'<div class="tk-note">'+esc(t.g.note)+'</div>':'')+
+      '</div></div>'
+    ).join("")+'</div>';
   }
+  tHtml+='</section>';
 
-  if(!visible.length){ tl.innerHTML='<div class="empty">Nothing here yet. Add a stop or a journey to begin.</div>'; return; }
-
-  visible.forEach(item=>{
-    tl.appendChild( item.type==="stop" ? stopNode(item) : journeyNode(item) );
+  // ---- 2) Day by day ----
+  let dHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#128197;</span> Day by day</h2><div class="dbd-rows">';
+  items.forEach(it=>{
+    if(it.type==="journey"){
+      const ic = ICON[it.mode] || ICON.car;
+      const det=[];
+      if(it.depart) det.push(esc(it.depart)+(it.arrive?" &rarr; "+esc(it.arrive):""));
+      if(it.operator) det.push(esc(it.operator));
+      dHtml+='<div class="dr travel"><div class="dr-date">'+esc(d1(it.date))+'</div>'+
+        '<div class="dr-ic">'+ic+'</div><div class="dr-main">'+
+        '<span class="dr-route">'+esc(it.from||"")+' &rarr; '+esc(it.to||"")+'</span>'+
+        (det.length?'<span class="dr-sub">'+det.join(" &middot; ")+'</span>':'')+'</div></div>';
+    } else {
+      const stay = it.lodgingName ? esc(it.lodgingName)+(it.lodgingStatus==="booked"?" &check;":"") : "";
+      dHtml+='<div class="dr stay"><div class="dr-date">'+esc(cr(it.dateStart,it.dateEnd))+'</div>'+
+        '<div class="dr-ic dot">&#9679;</div><div class="dr-main">'+
+        '<span class="dr-place">'+esc(it.place||"")+'</span>'+
+        (stay?'<span class="dr-sub">'+stay+'</span>':'')+'</div></div>';
+    }
   });
+  dHtml+='</div></section>';
+
+  // ---- 3) The places ----
+  let cHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#127961;</span> The places</h2>';
+  stops.forEach(s=>{
+    let body="";
+    CAT_ORDER.forEach(cat=>{
+      const gs=(s.guide||[]).filter(g=>g.cat===cat);
+      if(!gs.length) return;
+      body+='<div class="cg"><div class="cg-t">'+CAT[cat]+'</div>'+ gs.map(g=>
+        '<div class="ci"><span class="ci-name">'+esc(g.title)+
+          (g.ticket?' <span class="tag tobook">Ticket</span>':'')+
+          (g.status==="booked"?' <span class="tag booked">Booked</span>':'')+
+        '</span>'+(g.note?'<div class="ci-note">'+esc(g.note)+'</div>':'')+'</div>'
+      ).join("")+'</div>';
+    });
+    const stayLine = s.lodgingName
+      ? '<div class="city-stay">&#128719; '+esc(s.lodgingName)+(s.lodgingType?' &middot; '+esc(s.lodgingType):'')+' '+statusTag(s.lodgingStatus)+
+        (s.lodgingUrl?' <a class="lodge-go" href="'+esc(s.lodgingUrl)+'" target="_blank" rel="noopener" title="Open booking">'+ICON.go+'</a>':'')+'</div>'
+      : "";
+    cHtml+='<div class="city"><div class="city-head">'+
+      '<h3 class="city-name">'+(s.flag?'<span class="flag">'+esc(s.flag)+'</span>':'')+esc(s.place)+'</h3>'+
+      '<div class="city-dates">'+esc(fmtRange(s.dateStart,s.dateEnd))+'</div>'+
+      stayLine+
+      (s.summary?'<div class="city-sum">'+esc(s.summary)+'</div>':'')+
+      '</div>'+(body?'<div class="city-body">'+body+'</div>':'')+'</div>';
+  });
+  cHtml+='</section>';
+
+  tl.innerHTML = STYLE + tHtml + dHtml + cHtml;
 }
 
 function node(inner, iconKey, openable, id){
