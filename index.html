@@ -383,7 +383,8 @@ const SEED = {
       "duration": "11h 24m",
       "operator": "JetBlue (B6 1806/1620)",
       "status": "booked",
-      "note": "Confirmed — JetBlue, ref MXFMLE. Nashville 13:06 (28 Jun), 1 stop Boston (1h54 layover), into London Heathrow 06:30 (29 Jun)."
+      "note": "Confirmed — JetBlue, ref MXFMLE. Nashville 13:06 (28 Jun), 1 stop Boston (1h54 layover), into London Heathrow 06:30 (29 Jun).",
+      "who": "alexis"
     },
     {
       "id": "s1",
@@ -469,7 +470,8 @@ const SEED = {
       "duration": "approx 3h 30m – 4h",
       "operator": "By car (or train to Teignmouth + taxi)",
       "status": "idea",
-      "note": "The lane down to the Cary Arms is famously steep and easy to miss. Take it slowly. By rail it is Teignmouth station then a short taxi."
+      "note": "The lane down to the Cary Arms is famously steep and easy to miss. Take it slowly. By rail it is Teignmouth station then a short taxi.",
+      "who": "both"
     },
     {
       "id": "s2",
@@ -571,7 +573,8 @@ const SEED = {
       "status": "booked",
       "note": "Booked — easyJet EJU8405, ref KCRFVVM. London Gatwick North Terminal 16:30 to Paris CDG Terminal 2D 18:50. Bag drop opens 14:00, closes 15:30; gate closes 30 min before departure. You'll need to get up from Devon to Gatwick that morning — train Torquay to London (about 2h45) then across to Gatwick, or drive (about 3h30).",
       "depart": "16:30",
-      "arrive": "18:50"
+      "arrive": "18:50",
+      "who": "both"
     },
     {
       "id": "s4",
@@ -680,7 +683,8 @@ const SEED = {
       "duration": "about 5h by TGV, or ~1h30 flight to Nice",
       "operator": "SNCF TGV (Paris Gare de Lyon to Cannes) or fly to Nice",
       "status": "idea",
-      "note": "Direct/one-change TGVs run Paris Gare de Lyon to Cannes in about 5h. Faster: fly Paris to Nice (about 1h30), then Cannes is ~30 min west along the coast."
+      "note": "Direct/one-change TGVs run Paris Gare de Lyon to Cannes in about 5h. Faster: fly Paris to Nice (about 1h30), then Cannes is ~30 min west along the coast.",
+      "who": "both"
     },
     {
       "id": "sR1",
@@ -708,7 +712,8 @@ const SEED = {
       "duration": "about 1h30 to fly, or coastal train",
       "operator": "Fly (Nice or Montpellier to Barcelona), or coastal train",
       "status": "idea",
-      "note": "Quickest is to fly Nice to Barcelona (about 1h30) — Nice airport is ~30 min from Cannes. The coastal train toward the Spanish border is the scenic-but-slow alternative."
+      "note": "Quickest is to fly Nice to Barcelona (about 1h30) — Nice airport is ~30 min from Cannes. The coastal train toward the Spanish border is the scenic-but-slow alternative.",
+      "who": "both"
     },
     {
       "id": "s5",
@@ -794,7 +799,8 @@ const SEED = {
       "operator": "Wizz Air (Barcelona to London, confirm Luton vs Gatwick)",
       "status": "tobook",
       "note": "Morning Wizz Air out of Barcelona (around 09:30). Then onward to Prestwood for the final few days.",
-      "depart": "09:30"
+      "depart": "09:30",
+      "who": "both"
     },
     {
       "id": "s6",
@@ -846,7 +852,8 @@ const SEED = {
       "duration": "about 55 min",
       "operator": "Chiltern Railways into Marylebone",
       "status": "idea",
-      "note": "Into town for the wedding."
+      "note": "Into town for the wedding.",
+      "who": "both"
     },
     {
       "id": "s7",
@@ -882,7 +889,8 @@ const SEED = {
       "duration": "about 55 min",
       "operator": "Chiltern Railways from Marylebone",
       "status": "idea",
-      "note": "Back home after the wedding."
+      "note": "Back home after the wedding.",
+      "who": "both"
     },
     {
       "id": "s8",
@@ -911,7 +919,38 @@ const SEED = {
       "duration": "14h 53m",
       "operator": "JetBlue (B6 2220/1173)",
       "status": "booked",
-      "note": "Confirmed — JetBlue, ref MXFMLE. Heathrow 08:15, 1 stop New York JFK (4h layover), into Nashville 17:08. (Your gf's return — moved from 15 to 19 Jul for the wedding.)"
+      "note": "Confirmed — JetBlue, ref MXFMLE. Heathrow 08:15, 1 stop New York JFK (4h layover), into Nashville 17:08. (Your gf's return — moved from 15 to 19 Jul for the wedding.)",
+      "who": "alexis"
+    },
+    {
+      "id": "jb1",
+      "type": "journey",
+      "mode": "plane",
+      "who": "ben",
+      "from": "London (LHR)",
+      "to": "Nashville (BNA)",
+      "date": "2026-07-28",
+      "depart": "08:15",
+      "arrive": "17:03",
+      "duration": "about 14h 48m",
+      "operator": "JetBlue",
+      "status": "booked",
+      "note": "Ben's flight. Heathrow 08:15, 1 stop at New York JFK, into Nashville 17:03."
+    },
+    {
+      "id": "jb2",
+      "type": "journey",
+      "mode": "plane",
+      "who": "ben",
+      "from": "Nashville (BNA)",
+      "to": "London (LHR)",
+      "date": "2026-08-19",
+      "depart": "10:50",
+      "arrive": "09:30",
+      "duration": "about 15h",
+      "operator": "JetBlue",
+      "status": "booked",
+      "note": "Ben's return. Nashville 10:50, 1 stop at New York JFK, into Heathrow 09:30 the next day (20 Aug)."
     }
   ]
 };
@@ -996,8 +1035,8 @@ function render(){
   const tl = document.getElementById("timeline");
   const items = state.items || [];
   const stops = items.filter(i=>i.type==="stop");
+  const whoLabel = {alexis:"Alexis", ben:"Ben", both:"Together"};
 
-  // compact date / range for the day-by-day rows
   const d1 = s => { const d=parseISO(s); return d ? DAYS[d.getDay()]+" "+d.getDate()+" "+MONTHS[d.getMonth()] : ""; };
   const cr = (a,b) => {
     const da=parseISO(a), db=parseISO(b);
@@ -1013,6 +1052,10 @@ function render(){
     .dbd-h{font-family:"Cormorant Garamond",serif;font-size:29px;font-weight:600;color:var(--gold-deep,#9a7b2e);
       border-bottom:1px solid var(--line,#e6e0d4);padding-bottom:8px;margin:0 0 16px;display:flex;align-items:center;gap:10px;}
     .dbd-em{font-size:23px;line-height:1;}
+    .cal-bar{text-align:center;margin:0 0 28px;}
+    .cal-btn{font-family:inherit;font-size:13px;letter-spacing:.04em;padding:10px 20px;border:1px solid var(--gold-deep,#9a7b2e);
+      background:transparent;color:var(--gold-deep,#9a7b2e);border-radius:24px;cursor:pointer;transition:.15s;}
+    .cal-btn:hover{background:var(--gold-deep,#9a7b2e);color:#fff;}
     .tk-list{display:grid;gap:9px;}
     .tk{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line,#e6e0d4);border-radius:10px;}
     .tk-box{flex:none;width:17px;height:17px;border:1.5px solid var(--gold-deep,#9a7b2e);border-radius:4px;margin-top:2px;}
@@ -1020,6 +1063,10 @@ function render(){
     .tk-city{font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted,#9a8f78);margin-left:8px;}
     .tk-note{font-size:13.5px;color:var(--ink-soft,#5b5446);margin-top:3px;}
     .dbd-allset{color:var(--ink-soft,#5b5446);font-style:italic;}
+    .dbd-legend{display:flex;gap:18px;margin:-4px 0 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft,#5b5446);}
+    .dbd-legend .lg{display:inline-flex;align-items:center;gap:6px;}
+    .dbd-legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+    .dbd-legend .lg-alexis i{background:#b06a86;} .dbd-legend .lg-ben i{background:#4f6d8c;} .dbd-legend .lg-both i{background:#7a6a9a;}
     .dbd-rows{display:grid;gap:3px;background:#e9f0e6;border-radius:12px;padding:10px 14px;}
     .dr{display:grid;grid-template-columns:118px 24px 1fr;align-items:center;gap:11px;padding:8px 6px;border-bottom:1px dashed #cdd9c7;}
     .dr:last-child{border-bottom:none;}
@@ -1027,7 +1074,12 @@ function render(){
     .dr-ic{width:23px;height:23px;color:#3a5a40;}
     .dr-ic svg{width:21px;height:21px;}
     .dr-ic.dot{font-size:10px;text-align:center;line-height:23px;}
-    .dr.travel{background:#d3e3cc;border-radius:8px;border-bottom:none;}
+    .dr.travel{border-radius:8px;border-bottom:none;border-left:4px solid #ccc;}
+    .dr.who-alexis{background:#f5e9ef;border-left-color:#b06a86;}  .dr.who-alexis .dr-ic{color:#b06a86;}
+    .dr.who-ben{background:#e7eef4;border-left-color:#4f6d8c;}     .dr.who-ben .dr-ic{color:#4f6d8c;}
+    .dr.who-both{background:#ece7f3;border-left-color:#7a6a9a;}    .dr.who-both .dr-ic{color:#7a6a9a;}
+    .who-tag{font-size:9.5px;text-transform:uppercase;letter-spacing:.13em;font-weight:600;margin-left:8px;vertical-align:1px;}
+    .who-alexis .who-tag{color:#b06a86;} .who-ben .who-tag{color:#4f6d8c;} .who-both .who-tag{color:#7a6a9a;}
     .dr-route,.dr-place{font-weight:600;}
     .dr-sub{display:block;font-size:12.5px;color:var(--ink-soft,#5b5446);font-weight:400;margin-top:1px;}
     .city{border:1px solid var(--line,#e6e0d4);border-radius:12px;padding:18px 20px;margin:0 0 15px;}
@@ -1043,6 +1095,8 @@ function render(){
     .lodge-go{display:inline-block;width:15px;height:15px;vertical-align:-2px;color:var(--gold-deep,#9a7b2e);}
     #addStop,#addJourney,#filterBook,#expandAll{display:none;}
   </style>`;
+
+  const calBtn = '<div class="cal-bar"><button class="cal-btn" onclick="exportICS()">&#128197;  Add to Google / Outlook calendar</button></div>';
 
   // ---- 1) Tickets to book ----
   const tix=[];
@@ -1061,16 +1115,19 @@ function render(){
   tHtml+='</section>';
 
   // ---- 2) Day by day ----
-  let dHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#128197;</span> Day by day</h2><div class="dbd-rows">';
+  let dHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#128197;</span> Day by day</h2>'+
+    '<div class="dbd-legend"><span class="lg lg-both"><i></i>Together</span><span class="lg lg-alexis"><i></i>Alexis</span><span class="lg lg-ben"><i></i>Ben</span></div>'+
+    '<div class="dbd-rows">';
   items.forEach(it=>{
     if(it.type==="journey"){
       const ic = ICON[it.mode] || ICON.car;
+      const who = it.who || "both";
       const det=[];
       if(it.depart) det.push(esc(it.depart)+(it.arrive?" &rarr; "+esc(it.arrive):""));
       if(it.operator) det.push(esc(it.operator));
-      dHtml+='<div class="dr travel"><div class="dr-date">'+esc(d1(it.date))+'</div>'+
+      dHtml+='<div class="dr travel who-'+who+'"><div class="dr-date">'+esc(d1(it.date))+'</div>'+
         '<div class="dr-ic">'+ic+'</div><div class="dr-main">'+
-        '<span class="dr-route">'+esc(it.from||"")+' &rarr; '+esc(it.to||"")+'</span>'+
+        '<span class="dr-route">'+esc(it.from||"")+' &rarr; '+esc(it.to||"")+' <span class="who-tag">'+(whoLabel[who]||"Together")+'</span></span>'+
         (det.length?'<span class="dr-sub">'+det.join(" &middot; ")+'</span>':'')+'</div></div>';
     } else {
       const stay = it.lodgingName ? esc(it.lodgingName)+(it.lodgingStatus==="booked"?" &check;":"") : "";
@@ -1109,8 +1166,51 @@ function render(){
   });
   cHtml+='</section>';
 
-  tl.innerHTML = STYLE + tHtml + dHtml + cHtml;
+  tl.innerHTML = STYLE + calBtn + tHtml + dHtml + cHtml;
 }
+
+// ---- Calendar export (.ics — imports into Google Calendar & Outlook) ----
+window.exportICS = function(){
+  const pad = n => String(n).padStart(2,"0");
+  const whoName = {alexis:"Alexis", ben:"Ben", both:"Both"};
+  const toMin = t => { if(!t) return null; const m=String(t).match(/(\d{1,2}):(\d{2})/); if(!m) return null; let h=+m[1]; const mm=+m[2]; if(/pm/i.test(t)&&h<12)h+=12; if(/am/i.test(t)&&h===12)h=0; return h*60+mm; };
+  const stampDay = d => d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+  const dtLocal = (iso,t) => { const d=parseISO(iso); if(!d) return null; const mins=toMin(t)||0; return stampDay(d)+"T"+pad(Math.floor(mins/60))+pad(mins%60)+"00"; };
+  const escI = s => (s==null?"":String(s)).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n");
+  const L = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Grand Tour 2026//EN","CALSCALE:GREGORIAN","X-WR-CALNAME:Grand Tour 2026"];
+  let uid=0;
+  const add = o => {
+    L.push("BEGIN:VEVENT","UID:gt"+(uid++)+"@grandtour2026","DTSTAMP:20260101T000000Z");
+    if(o.allday){ L.push("DTSTART;VALUE=DATE:"+o.start); L.push("DTEND;VALUE=DATE:"+o.end); }
+    else { L.push("DTSTART:"+o.start); if(o.end) L.push("DTEND:"+o.end); }
+    L.push("SUMMARY:"+escI(o.summary));
+    if(o.desc) L.push("DESCRIPTION:"+escI(o.desc));
+    if(o.cat) L.push("CATEGORIES:"+escI(o.cat));
+    L.push("END:VEVENT");
+  };
+  (state.items||[]).forEach(it=>{
+    if(it.type==="journey"){
+      const kind = it.mode==="plane" ? "Flight" : (it.mode==="train" ? "Train" : "Travel");
+      const who = whoName[it.who||"both"];
+      const start = it.depart ? dtLocal(it.date, it.depart) : null;
+      let end = (start && it.arrive) ? dtLocal(it.date, it.arrive) : null;
+      if(start && end && end <= start){ const d=parseISO(it.date); d.setDate(d.getDate()+1); const mins=toMin(it.arrive)||0; end = stampDay(d)+"T"+pad(Math.floor(mins/60))+pad(mins%60)+"00"; }
+      const summary = kind+" ("+who+"): "+(it.from||"")+" → "+(it.to||"");
+      const desc = [it.operator, it.duration, it.note].filter(Boolean).join(" — ");
+      if(start) add({start:start, end:end, summary:summary, desc:desc, cat:who});
+      else { const d=parseISO(it.date); const nx=new Date(d); nx.setDate(nx.getDate()+1); add({allday:true, start:stampDay(d), end:stampDay(nx), summary:summary, desc:desc, cat:who}); }
+    } else if(it.dateStart){
+      const a=parseISO(it.dateStart), b=parseISO(it.dateEnd||it.dateStart);
+      add({allday:true, start:stampDay(a), end:stampDay(b), summary:(it.place||"Stay")+(it.lodgingName?" — "+it.lodgingName:""), desc:[it.lodgingType, it.summary].filter(Boolean).join("\n")});
+    }
+  });
+  L.push("END:VCALENDAR");
+  const blob = new Blob([L.join("\r\n")], {type:"text/calendar;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "grand-tour-2026.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+};
 
 function node(inner, iconKey, openable, id){
   const n=document.createElement("div");
