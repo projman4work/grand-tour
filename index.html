@@ -483,7 +483,7 @@ const SEED = {
       "lodgingName": "Cary Arms & Spa",
       "lodgingType": "Seaside inn",
       "lodgingStatus": "booked",
-      "summary": "A sheltered bay with red cliffs and a sea-facing spa, with the South West Coast Path from the door.",
+      "summary": "A sheltered bay with red cliffs and a sea-facing spa, with the South West Coast Path from the door. Here with Andy, Carolyn, Evie, Mum and Dad.",
       "guide": [
         {
           "id": "g7",
@@ -546,6 +546,14 @@ const SEED = {
           "cat": "exp",
           "title": "Tombstoning",
           "note": "Cliff-jumping into the bay, where it's safe.",
+          "ticket": false,
+          "status": ""
+        },
+        {
+          "id": "g42",
+          "cat": "exp",
+          "title": "Visit the parents' new house",
+          "note": "4 The Manor, Catherston Leweston, Charmouth — they move in on 2 July.",
           "ticket": false,
           "status": ""
         }
@@ -1012,13 +1020,14 @@ function render(){
     .tk-city{font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted,#9a8f78);margin-left:8px;}
     .tk-note{font-size:13.5px;color:var(--ink-soft,#5b5446);margin-top:3px;}
     .dbd-allset{color:var(--ink-soft,#5b5446);font-style:italic;}
-    .dbd-rows{display:grid;gap:3px;}
-    .dr{display:grid;grid-template-columns:118px 24px 1fr;align-items:center;gap:11px;padding:8px 6px;border-bottom:1px dashed var(--line,#ece7da);}
-    .dr-date{font-size:12.5px;color:var(--muted,#9a8f78);text-align:right;font-variant-numeric:tabular-nums;}
-    .dr-ic{width:23px;height:23px;color:var(--gold-deep,#9a7b2e);}
+    .dbd-rows{display:grid;gap:3px;background:#e9f0e6;border-radius:12px;padding:10px 14px;}
+    .dr{display:grid;grid-template-columns:118px 24px 1fr;align-items:center;gap:11px;padding:8px 6px;border-bottom:1px dashed #cdd9c7;}
+    .dr:last-child{border-bottom:none;}
+    .dr-date{font-size:12.5px;color:#3a5a40;text-align:right;font-variant-numeric:tabular-nums;}
+    .dr-ic{width:23px;height:23px;color:#3a5a40;}
     .dr-ic svg{width:21px;height:21px;}
     .dr-ic.dot{font-size:10px;text-align:center;line-height:23px;}
-    .dr.travel{background:rgba(154,123,46,.06);border-radius:8px;border-bottom:none;}
+    .dr.travel{background:#d3e3cc;border-radius:8px;border-bottom:none;}
     .dr-route,.dr-place{font-weight:600;}
     .dr-sub{display:block;font-size:12.5px;color:var(--ink-soft,#5b5446);font-weight:400;margin-top:1px;}
     .city{border:1px solid var(--line,#e6e0d4);border-radius:12px;padding:18px 20px;margin:0 0 15px;}
