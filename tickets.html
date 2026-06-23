@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tickets &amp; Print — Grand Tour 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600&display=swap" rel="stylesheet">
+<style>
+  :root{ --paper:#fbf8f1; --ink:#2c2a26; --ink-soft:#5b5446; --muted:#9a8f78; --line:#e6e0d4; --gold-deep:#9a7b2e; }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:"EB Garamond",Georgia,serif; line-height:1.5; padding:28px 18px 60px; }
+  .wrap{ max-width:760px; margin:0 auto; }
+  .mast{ text-align:center; margin-bottom:18px; }
+  .eyebrow{ text-transform:uppercase; letter-spacing:.3em; font-size:11px; color:var(--muted); }
+  h1{ font-family:"Cormorant Garamond",serif; font-weight:600; font-size:38px; margin:8px 0 4px; }
+  .sub{ color:var(--ink-soft); font-size:15px; }
+  .tabs{ display:flex; gap:8px; justify-content:center; margin:22px 0 26px; }
+  .tab{ font-size:12px; letter-spacing:.04em; padding:8px 18px; border:1px solid var(--line); border-radius:22px; color:var(--ink-soft); text-decoration:none; }
+  .tab.active{ background:var(--gold-deep); color:#fff; border-color:var(--gold-deep); }
+  .panel{ border:1px solid var(--line); border-radius:14px; padding:22px; background:#fff; }
+  h2{ font-family:"Cormorant Garamond",serif; font-size:25px; color:var(--gold-deep); margin:0 0 6px; }
+  .lead{ color:var(--ink-soft); font-size:14px; margin:0 0 16px; }
+  .dropzone{ border:1.5px dashed #b8a06a; border-radius:12px; padding:34px 20px; text-align:center; color:var(--ink-soft); cursor:pointer; background:#faf8f3; transition:.15s; }
+  .dropzone.over{ background:#f1ead8; border-color:var(--gold-deep); }
+  .ticket-list{ display:grid; gap:8px; margin-top:14px; }
+  .tk-row{ display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid var(--line); border-radius:9px; }
+  .tk-row .nm{ flex:1; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tk-row button{ font-family:inherit; font-size:12px; border:1px solid var(--line); background:#fff; border-radius:6px; padding:5px 9px; cursor:pointer; color:var(--ink-soft); }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:16px; }
+  .btn{ font-family:inherit; font-size:13px; letter-spacing:.03em; padding:10px 18px; border:1px solid var(--gold-deep); background:var(--gold-deep); color:#fff; border-radius:22px; cursor:pointer; }
+  .btn.ghost{ background:transparent; color:var(--gold-deep); }
+  .note{ font-size:12.5px; color:var(--muted); margin-top:18px; font-style:italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div class="eyebrow">Grand Tour 2026</div>
+    <h1>Tickets &amp; Print</h1>
+    <div class="sub">Drop the ticket PDFs, put them in order, then print.</div>
+  </header>
+
+  <div class="tabs">
+    <a class="tab" href="index.html">Itinerary</a>
+    <span class="tab active">Tickets &amp; Print</span>
+  </div>
+
+  <div class="panel">
+    <h2>Your tickets</h2>
+    <p class="lead">Drag &amp; drop your ticket PDFs below (boarding passes, museum pass, etc.). Reorder them into the sequence you'll need them, then print one or all.</p>
+    <div id="dropzone" class="dropzone">Drop ticket PDFs here, or click to choose</div>
+    <input type="file" id="ticketInput" accept="application/pdf" multiple style="display:none">
+    <div id="ticketList" class="ticket-list"></div>
+    <div class="row">
+      <button class="btn" onclick="printAllTickets()">Print all tickets (in order)</button>
+    </div>
+    <p class="note">Note: tickets stay only for this browser session — a static site can't store files. Drop them when you're about to print. Allow pop-ups so the merged PDF can open.</p>
+  </div>
+</div>
+
+<script>
+  function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+  window.__tickets = [];
+  function addTickets(files){
+    Array.prototype.slice.call(files||[]).forEach(function(f){
+      if(!(/\.pdf$/i.test(f.name) || f.type==="application/pdf")) return;
+      var r=new FileReader();
+      r.onload=function(){ window.__tickets.push({name:f.name, bytes:r.result}); renderTicketList(); };
+      r.readAsArrayBuffer(f);
+    });
+  }
+  function renderTicketList(){
+    var el=document.getElementById("ticketList");
+    if(!window.__tickets.length){ el.innerHTML='<div class="note" style="margin-top:6px">No tickets yet.</div>'; return; }
+    el.innerHTML=window.__tickets.map(function(t,i){
+      return '<div class="tk-row"><span class="nm">'+(i+1)+'. '+esc(t.name)+'</span>'+
+        '<button onclick="moveTicket('+i+',-1)" title="Up">&#9650;</button>'+
+        '<button onclick="moveTicket('+i+',1)" title="Down">&#9660;</button>'+
+        '<button onclick="printTicket('+i+')">Print</button>'+
+        '<button onclick="removeTicket('+i+')">Remove</button></div>';
+    }).join("");
+  }
+  function moveTicket(i,d){ var a=window.__tickets, j=i+d; if(j<0||j>=a.length) return; var t=a[i]; a[i]=a[j]; a[j]=t; renderTicketList(); }
+  function removeTicket(i){ window.__tickets.splice(i,1); renderTicketList(); }
+  function printTicket(i){ var t=window.__tickets[i]; if(!t) return; window.open(URL.createObjectURL(new Blob([t.bytes],{type:"application/pdf"})),"_blank"); }
+  function ensurePdfLib(){ return window.PDFLib ? Promise.resolve() : new Promise(function(res,rej){ var s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"; s.onload=res; s.onerror=function(){ rej(new Error("could not load PDF tools")); }; document.head.appendChild(s); }); }
+  function printAllTickets(){
+    if(!window.__tickets.length){ alert("Drop your ticket PDFs in first."); return; }
+    ensurePdfLib().then(function(){
+      var PDFDocument=window.PDFLib.PDFDocument;
+      return PDFDocument.create().then(function(merged){
+        var chain=Promise.resolve();
+        window.__tickets.forEach(function(t){
+          chain=chain.then(function(){ return PDFDocument.load(t.bytes.slice(0)).then(function(src){ return merged.copyPages(src, src.getPageIndices()).then(function(pages){ pages.forEach(function(p){ merged.addPage(p); }); }); }); });
+        });
+        return chain.then(function(){ return merged.save(); }).then(function(bytes){ window.open(URL.createObjectURL(new Blob([bytes],{type:"application/pdf"})),"_blank"); });
+      });
+    }).catch(function(e){ alert("Could not merge the PDFs: "+((e&&e.message)||e)); });
+  }
+  (function(){
+    var dz=document.getElementById("dropzone"), inp=document.getElementById("ticketInput");
+    dz.addEventListener("click",function(){ inp.click(); });
+    inp.addEventListener("change",function(e){ addTickets(e.target.files); inp.value=""; });
+    ["dragover","dragenter"].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.add("over"); }); });
+    ["dragleave","drop"].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.remove("over"); }); });
+    dz.addEventListener("drop",function(e){ if(e.dataTransfer&&e.dataTransfer.files) addTickets(e.dataTransfer.files); });
+    renderTicketList();
+  })();
+</script>
+</body>
+</html>

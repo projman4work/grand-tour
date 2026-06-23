@@ -1073,6 +1073,22 @@ function render(){
     .tk-row .nm{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .tk-row button{font-family:inherit;font-size:12px;border:1px solid var(--line,#e6e0d4);background:#fff;border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--ink-soft,#5b5446);}
     @media print{ #docs-panel,.toolbar,.mast .stats{display:none!important;} }
+    .tabs{display:flex;gap:8px;justify-content:center;margin:0 0 24px;}
+    .tab{font-size:12px;letter-spacing:.04em;padding:8px 18px;border:1px solid var(--line,#e6e0d4);border-radius:22px;color:var(--ink-soft,#5b5446);text-decoration:none;cursor:pointer;}
+    .tab.active{background:var(--gold-deep,#9a7b2e);color:#fff;border-color:var(--gold-deep,#9a7b2e);}
+    .cal-month{margin:0 0 20px;}
+    .cal-mh{font-family:"Cormorant Garamond",serif;font-size:20px;color:#3a5a40;margin:0 0 6px;}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#dbe5d6;border:1px solid #dbe5d6;border-radius:8px;overflow:hidden;}
+    .cal-wd{background:#eef3ec;color:#3a5a40;font-size:10px;text-transform:uppercase;letter-spacing:.08em;text-align:center;padding:5px 0;font-weight:600;}
+    .cal-cell{background:#fff;min-height:62px;padding:4px 4px 6px;}
+    .cal-cell.out{background:#f7f9f6;}
+    .cal-dn{display:block;font-size:11px;color:#9a8f78;margin-bottom:3px;}
+    .cal-chip{display:block;font-size:9.5px;line-height:1.35;padding:1px 5px;border-radius:4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .cal-chip.stay{background:#eef3ec;color:#3a5a40;}
+    .cal-chip.who-alexis{background:#f3e1ea;color:#9c4f70;}
+    .cal-chip.who-ben{background:#e1e9f2;color:#3f5e80;}
+    .cal-chip.who-both{background:#e8e2f1;color:#6a5a8e;}
+    .dbd-legend .lg-stay i{background:#9bb59a;}
   </style>`;
 
   // ---- 0) Time in Europe (USA = home, not counted) ----
@@ -1084,7 +1100,8 @@ function render(){
     cbRows.map(r=>'<div class="cb"><div class="cb-country">'+esc(r.c)+'</div><div class="cb-num">'+r.days+' <span class="cb-unit">day'+(r.days===1?'':'s')+'</span></div><div class="cb-sub">'+r.nights+' night'+(r.nights===1?'':'s')+'</div></div>').join('')+
     '</div><div class="cb-total">'+euNights+' nights across Europe &middot; the US is home, so it&rsquo;s not counted.</div></section>';
 
-  const calBtn = '<div class="cal-bar"><button class="cal-btn" onclick="exportICS()">&#128197;  Add to Google / Outlook calendar</button></div>';
+  const tabsHtml = '<div class="tabs"><span class="tab active">Itinerary</span><a class="tab" href="tickets.html">Tickets &amp; Print</a></div>';
+  const docsBar = '<div class="cal-bar"><button class="cal-btn" onclick="openItineraryPrint()">&#128462; Preview &amp; print itinerary</button> <button class="cal-btn" onclick="exportICS()">&#128197; Add to Google / Outlook calendar</button></div>';
 
   // ---- 1) Tickets to book ----
   const tix=[];
@@ -1102,36 +1119,32 @@ function render(){
   }
   tHtml+='</section>';
 
-  // ---- 2) Day by day ----
-  let dHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#128197;</span> Day by day</h2>'+
-    '<div class="dbd-legend"><span class="lg lg-both"><i></i>Together</span><span class="lg lg-alexis"><i></i>Alexis</span><span class="lg lg-ben"><i></i>Ben</span></div>'+
-    '<div class="dbd-rows">';
+  // ---- 2) Calendar (Google-style month grid) ----
+  const chips={};
+  const pushChip=(d,cls,label)=>{ if(!d)return; const k=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); (chips[k]=chips[k]||[]).push('<span class="cal-chip '+cls+'">'+esc(label)+'</span>'); };
+  const calDates=[];
   items.forEach(it=>{
-    if(it.type==="journey"){
-      const ic = ICON[it.mode] || ICON.car;
-      const who = it.who || "both";
-      const det=[];
-      if(it.depart) det.push(esc(it.depart)+(it.arrive?" &rarr; "+esc(it.arrive):""));
-      if(it.operator) det.push(esc(it.operator));
-      dHtml+='<div class="dr travel who-'+who+'"><div class="dr-date">'+esc(d1(it.date))+'</div>'+
-        '<div class="dr-ic">'+ic+'</div><div class="dr-main">'+
-        '<span class="dr-route">'+esc(it.from||"")+' &rarr; '+esc(it.to||"")+' <span class="who-tag">'+(whoLabel[who]||"Together")+'</span></span>'+
-        (det.length?'<span class="dr-sub">'+det.join(" &middot; ")+'</span>':'')+'</div></div>';
-    } else if(it.type==="event"){
-      const who = it.who || "both";
-      dHtml+='<div class="dr travel who-'+who+'"><div class="dr-date">'+esc(d1(it.date))+'</div>'+
-        '<div class="dr-ic">&#10047;</div><div class="dr-main">'+
-        '<span class="dr-route">'+esc(it.title||"")+' <span class="who-tag">'+(whoLabel[who]||"Together")+'</span></span>'+
-        '<span class="dr-sub">'+(it.time?esc(it.time)+" &middot; ":"")+esc(it.location||"")+'</span></div></div>';
-    } else {
-      const stay = it.lodgingName ? esc(it.lodgingName)+(it.lodgingStatus==="booked"?" &check;":"") : "";
-      dHtml+='<div class="dr stay"><div class="dr-date">'+esc(cr(it.dateStart,it.dateEnd))+'</div>'+
-        '<div class="dr-ic dot">&#9679;</div><div class="dr-main">'+
-        '<span class="dr-place">'+esc(it.place||"")+'</span>'+
-        (stay?'<span class="dr-sub">'+stay+'</span>':'')+'</div></div>';
-    }
+    if(it.type==="journey"){ const d=parseISO(it.date); if(d){ calDates.push(d); pushChip(d,"who-"+(it.who||"both"),(it.mode==="plane"?"✈ ":"→ ")+(it.to||"")); } }
+    else if(it.type==="event"){ const d=parseISO(it.date); if(d){ calDates.push(d); pushChip(d,"who-"+(it.who||"both")+" ev",(it.time?it.time+" ":"")+(it.title||"")); } }
+    else if(it.dateStart){ const a=parseISO(it.dateStart), b=parseISO(it.dateEnd||it.dateStart); if(a)calDates.push(a); if(b)calDates.push(b); if(a&&b){ for(let d=new Date(a); d<b; d.setDate(d.getDate()+1)) pushChip(new Date(d),"stay",it.place||""); } }
   });
-  dHtml+='</div></section>';
+  const WD=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const monthGrid=(y,m)=>{
+    const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const dim=new Date(y,m+1,0).getDate();
+    let cells=WD.map(w=>'<div class="cal-wd">'+w+'</div>').join("");
+    for(let i=0;i<startDow;i++) cells+='<div class="cal-cell out"></div>';
+    for(let day=1;day<=dim;day++){ const k=y+"-"+m+"-"+day; cells+='<div class="cal-cell"><span class="cal-dn">'+day+'</span>'+((chips[k]||[]).join(""))+'</div>'; }
+    return '<div class="cal-month"><div class="cal-mh">'+MONTHS[m]+' '+y+'</div><div class="cal-grid">'+cells+'</div></div>';
+  };
+  let grids="";
+  if(calDates.length){
+    const minD=new Date(Math.min.apply(null,calDates.map(d=>+d))), maxD=new Date(Math.max.apply(null,calDates.map(d=>+d)));
+    let y=minD.getFullYear(), m=minD.getMonth(), guard=0;
+    while((y<maxD.getFullYear() || (y===maxD.getFullYear() && m<=maxD.getMonth())) && guard++<24){ grids+=monthGrid(y,m); m++; if(m>11){m=0;y++;} }
+  }
+  let dHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#128197;</span> Calendar</h2>'+
+    '<div class="dbd-legend"><span class="lg lg-both"><i></i>Together</span><span class="lg lg-alexis"><i></i>Alexis</span><span class="lg lg-ben"><i></i>Ben</span><span class="lg lg-stay"><i></i>Stay</span></div>'+
+    grids+'</section>';
 
   // ---- 3) The places ----
   let cHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#127961;</span> The places</h2>';
@@ -1160,8 +1173,7 @@ function render(){
   });
   cHtml+='</section>';
 
-  tl.innerHTML = STYLE + cbHtml + calBtn + tHtml + dHtml + cHtml;
-  try{ if(window.setupDocuments) setupDocuments(); }catch(e){}
+  tl.innerHTML = STYLE + tabsHtml + cbHtml + docsBar + tHtml + dHtml + cHtml;
 }
 
 // ---- Calendar export (.ics — imports into Google Calendar & Outlook) ----
