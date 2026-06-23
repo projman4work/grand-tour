@@ -508,16 +508,48 @@ const SEED = {
           "note": "Cliff-jumping into the bay, where it's safe.",
           "ticket": false,
           "status": ""
-        },
-        {
-          "id": "g42",
-          "cat": "exp",
-          "title": "Visit the parents' new house",
-          "note": "4 The Manor, Catherston Leweston, Charmouth — viewing at 11:30am on 2 July (parents move in later this year). ~53 mi / 1h15-1h30 drive via the A35, so leave Babbacombe around 10:00.",
-          "ticket": false,
-          "status": ""
         }
       ]
+    },
+    {
+      "id": "ev3",
+      "type": "event",
+      "who": "both",
+      "title": "Drive to Charmouth",
+      "location": "Babbacombe → Catherston Leweston · ~1h15–1h30",
+      "date": "2026-07-02",
+      "time": "10:00",
+      "mins": 80
+    },
+    {
+      "id": "ev4",
+      "type": "event",
+      "who": "both",
+      "title": "House viewing — 4 The Manor",
+      "location": "Catherston Leweston, Charmouth",
+      "date": "2026-07-02",
+      "time": "11:30",
+      "mins": 45
+    },
+    {
+      "id": "ev5",
+      "type": "event",
+      "who": "both",
+      "title": "Pub lunch (booked)",
+      "location": "near Charmouth",
+      "date": "2026-07-02",
+      "time": "12:30",
+      "mins": 90
+    },
+    {
+      "id": "ev6",
+      "type": "event",
+      "who": "both",
+      "title": "Drive back to Babbacombe",
+      "location": "Charmouth → Babbacombe · ~1h15–1h30",
+      "date": "2026-07-02",
+      "time": "14:00",
+      "mins": 80
     },
     {
       "id": "ev1",
@@ -1092,6 +1124,20 @@ function render(){
     .cal-chip.who-ben{background:#e1e9f2;color:#3f5e80;}
     .cal-chip.who-both{background:#e8e2f1;color:#6a5a8e;}
     .dbd-legend .lg-stay i{background:#9bb59a;}
+    .cal-cell.clk{cursor:pointer;} .cal-cell.clk:hover{background:#f2f6f0;}
+    .cal-more{display:block;font-size:9.5px;color:var(--muted,#9a8f78);padding:1px 5px;}
+    .day-ov{position:fixed;inset:0;background:rgba(40,36,30,.45);display:none;align-items:center;justify-content:center;z-index:999;padding:18px;}
+    .day-modal{background:#fff;border-radius:16px;max-width:460px;width:100%;max-height:85vh;overflow:auto;padding:22px 24px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+    .day-x{position:absolute;top:10px;right:14px;border:none;background:none;font-size:24px;color:var(--muted,#9a8f78);cursor:pointer;line-height:1;}
+    .day-date{font-family:"Cormorant Garamond",serif;font-size:24px;color:var(--gold-deep,#9a7b2e);}
+    .day-place{font-size:13px;color:var(--ink-soft,#5b5446);margin:2px 0 16px;}
+    .day-tl{display:grid;gap:11px;}
+    .dte{display:flex;gap:12px;border-left:3px solid #ccc;padding:3px 0 3px 12px;}
+    .dte.who-alexis{border-left-color:#b06a86;} .dte.who-ben{border-left-color:#4f6d8c;} .dte.who-both{border-left-color:#7a6a9a;}
+    .dte-t{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted,#9a8f78);min-width:46px;}
+    .dte-l{font-weight:600;font-size:14px;display:block;}
+    .dte-s{font-size:12.5px;color:var(--ink-soft,#5b5446);}
+    .day-empty{color:var(--ink-soft,#5b5446);font-style:italic;}
   </style>`;
 
   // ---- 0) Time in Europe (USA = home, not counted) ----
@@ -1136,7 +1182,7 @@ function render(){
     const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const dim=new Date(y,m+1,0).getDate();
     let cells=WD.map(w=>'<div class="cal-wd">'+w+'</div>').join("");
     for(let i=0;i<startDow;i++) cells+='<div class="cal-cell out"></div>';
-    for(let day=1;day<=dim;day++){ const k=y+"-"+m+"-"+day; cells+='<div class="cal-cell"><span class="cal-dn">'+day+'</span>'+((chips[k]||[]).join(""))+'</div>'; }
+    for(let day=1;day<=dim;day++){ const k=y+"-"+m+"-"+day; const cs=chips[k]||[]; const shown=cs.slice(0,3).join(""); const more=cs.length>3?'<span class="cal-more">+'+(cs.length-3)+' more</span>':''; cells+='<div class="cal-cell clk" onclick="openDay('+y+','+m+','+day+')"><span class="cal-dn">'+day+'</span>'+shown+more+'</div>'; }
     return '<div class="cal-month"><div class="cal-mh">'+MONTHS[m]+' '+y+'</div><div class="cal-grid">'+cells+'</div></div>';
   };
   let grids="";
@@ -1247,6 +1293,33 @@ window.markBooked=function(stopId, gid){
   g.status="booked";
   try{ if(typeof save==="function") save(); }catch(e){}
   render();
+};
+
+window.closeDay=function(){ var ov=document.getElementById("day-ov"); if(ov){ ov.style.display="none"; ov.innerHTML=""; } };
+window.openDay=function(y,m,day){
+  var items=(state.items||[]);
+  var target=new Date(y,m,day);
+  var onDay=function(iso){ var d=parseISO(iso); return d && d.getFullYear()===y && d.getMonth()===m && d.getDate()===day; };
+  var place=null;
+  items.forEach(function(it){ if(it.type==="stop" && it.dateStart){ var a=parseISO(it.dateStart), b=parseISO(it.dateEnd||it.dateStart); if(a && target>=a && (b ? target<b : target.getTime()===a.getTime())) place=it; } });
+  var timed=[];
+  items.forEach(function(it){
+    if(it.type==="event" && onDay(it.date)) timed.push({t:it.time||"", label:it.title||"", sub:it.location||"", who:it.who||"both"});
+    else if(it.type==="journey" && onDay(it.date)) timed.push({t:it.depart||"", label:(it.from||"")+" → "+(it.to||""), sub:[it.operator,it.duration].filter(Boolean).join(" · "), who:it.who||"both"});
+  });
+  timed.sort(function(a,b){ return (a.t||"zz").localeCompare(b.t||"zz"); });
+  var DAYL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var dateLabel=DAYL[target.getDay()]+", "+day+" "+MONTHS[m]+" "+y;
+  var rows = timed.length
+    ? timed.map(function(e){ return '<div class="dte who-'+e.who+'"><span class="dte-t">'+esc(e.t||"—")+'</span><div><span class="dte-l">'+esc(e.label)+'</span>'+(e.sub?'<span class="dte-s">'+esc(e.sub)+'</span>':'')+'</div></div>'; }).join("")
+    : '<div class="day-empty">Nothing scheduled'+(place?' — a free day in '+esc(place.place):'')+'.</div>';
+  var html='<div class="day-modal"><button class="day-x" onclick="closeDay()">&times;</button>'+
+    '<div class="day-date">'+esc(dateLabel)+'</div>'+
+    (place?'<div class="day-place">'+esc(place.place||"")+((place.lodgingName && place.lodgingName!==place.place)?' &middot; '+esc(place.lodgingName):"")+'</div>':'')+
+    '<div class="day-tl">'+rows+'</div></div>';
+  var ov=document.getElementById("day-ov");
+  if(!ov){ ov=document.createElement("div"); ov.id="day-ov"; ov.className="day-ov"; ov.addEventListener("click",function(e){ if(e.target===ov) closeDay(); }); document.body.appendChild(ov); }
+  ov.innerHTML=html; ov.style.display="flex";
 };
 
 // ============ Documents: ticket PDFs + printable itinerary ============
