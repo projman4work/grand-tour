@@ -483,7 +483,7 @@ const SEED = {
           "title": "The spa",
           "note": "Sea-view spa: pool, sauna, steam. Book treatments ahead.",
           "ticket": true,
-          "status": "tobook"
+          "status": "booked"
         },
         {
           "id": "g13",
@@ -1023,7 +1023,10 @@ function render(){
     .cb-sub{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted,#9a8f78);margin-top:5px;}
     .cb-total{margin-top:12px;font-size:12px;color:var(--ink-soft,#5b5446);font-style:italic;}
     .tk-list{display:grid;gap:9px;}
-    .tk{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line,#e6e0d4);border-radius:10px;}
+    .tk{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line,#e6e0d4);border-radius:10px;cursor:pointer;transition:.12s;}
+    .tk:hover{border-color:var(--gold-deep,#9a7b2e);background:rgba(154,123,46,.04);}
+    .tk:hover .tk-box{background:var(--gold-deep,#9a7b2e);}
+    .tk-hint{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted,#9a8f78);margin:-4px 0 10px;}
     .tk-box{flex:none;width:17px;height:17px;border:1.5px solid var(--gold-deep,#9a7b2e);border-radius:4px;margin-top:2px;}
     .tk-name{font-weight:600;}
     .tk-city{font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted,#9a8f78);margin-left:8px;}
@@ -1105,13 +1108,13 @@ function render(){
 
   // ---- 1) Tickets to book ----
   const tix=[];
-  stops.forEach(s=>(s.guide||[]).forEach(g=>{ if(g.ticket && g.status==="tobook") tix.push({city:s.place, g:g}); }));
+  stops.forEach(s=>(s.guide||[]).forEach(g=>{ if(g.ticket && g.status==="tobook") tix.push({stopId:s.id, city:s.place, g:g}); }));
   let tHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#127903;</span> Tickets to book</h2>';
   if(!tix.length){
     tHtml+='<div class="dbd-allset">All sorted &mdash; nothing left to book.</div>';
   } else {
-    tHtml+='<div class="tk-list">'+ tix.map(t=>
-      '<div class="tk"><span class="tk-box"></span><div class="tk-txt">'+
+    tHtml+='<div class="tk-hint">Tap a box once it&rsquo;s booked.</div><div class="tk-list">'+ tix.map(t=>
+      '<div class="tk" onclick="markBooked(\''+t.stopId+'\',\''+t.g.id+'\')" title="Mark as booked"><span class="tk-box"></span><div class="tk-txt">'+
         '<span class="tk-name">'+esc(t.g.title)+'</span><span class="tk-city">'+esc(t.city)+'</span>'+
         (t.g.note?'<div class="tk-note">'+esc(t.g.note)+'</div>':'')+
       '</div></div>'
@@ -1227,6 +1230,16 @@ window.exportICS = function(){
   a.href = URL.createObjectURL(blob);
   a.download = "grand-tour-2026.ics";
   document.body.appendChild(a); a.click(); a.remove();
+};
+
+window.markBooked=function(stopId, gid){
+  var st=(state.items||[]).filter(function(i){return i.id===stopId;})[0];
+  if(!st) return;
+  var g=(st.guide||[]).filter(function(x){return x.id===gid;})[0];
+  if(!g) return;
+  g.status="booked";
+  try{ if(typeof save==="function") save(); }catch(e){}
+  render();
 };
 
 // ============ Documents: ticket PDFs + printable itinerary ============
