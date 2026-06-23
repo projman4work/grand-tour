@@ -520,6 +520,16 @@ const SEED = {
       ]
     },
     {
+      "id": "ev1",
+      "type": "event",
+      "who": "alexis",
+      "title": "Spa facial — My Kind of Skin (60 min)",
+      "location": "Cary Arms spa",
+      "date": "2026-07-02",
+      "time": "15:45",
+      "mins": 60
+    },
+    {
       "id": "j3",
       "type": "journey",
       "mode": "plane",
@@ -1093,6 +1103,12 @@ function render(){
         '<div class="dr-ic">'+ic+'</div><div class="dr-main">'+
         '<span class="dr-route">'+esc(it.from||"")+' &rarr; '+esc(it.to||"")+' <span class="who-tag">'+(whoLabel[who]||"Together")+'</span></span>'+
         (det.length?'<span class="dr-sub">'+det.join(" &middot; ")+'</span>':'')+'</div></div>';
+    } else if(it.type==="event"){
+      const who = it.who || "both";
+      dHtml+='<div class="dr travel who-'+who+'"><div class="dr-date">'+esc(d1(it.date))+'</div>'+
+        '<div class="dr-ic">&#10047;</div><div class="dr-main">'+
+        '<span class="dr-route">'+esc(it.title||"")+' <span class="who-tag">'+(whoLabel[who]||"Together")+'</span></span>'+
+        '<span class="dr-sub">'+(it.time?esc(it.time)+" &middot; ":"")+esc(it.location||"")+'</span></div></div>';
     } else {
       const stay = it.lodgingName ? esc(it.lodgingName)+(it.lodgingStatus==="booked"?" &check;":"") : "";
       dHtml+='<div class="dr stay"><div class="dr-date">'+esc(cr(it.dateStart,it.dateEnd))+'</div>'+
@@ -1163,6 +1179,12 @@ window.exportICS = function(){
       const desc = [it.operator, it.duration, it.note].filter(Boolean).join(" — ");
       if(start) add({start:start, end:end, summary:summary, desc:desc, cat:who});
       else { const d=parseISO(it.date); const nx=new Date(d); nx.setDate(nx.getDate()+1); add({allday:true, start:stampDay(d), end:stampDay(nx), summary:summary, desc:desc, cat:who}); }
+    } else if(it.type==="event" && it.date){
+      const who = whoName[it.who||"both"];
+      const start = dtLocal(it.date, it.time);
+      let end = null;
+      if(start){ const total=(toMin(it.time)||0)+(it.mins||60); const d=parseISO(it.date); d.setDate(d.getDate()+Math.floor(total/1440)); const mm=total%1440; end=stampDay(d)+"T"+pad(Math.floor(mm/60))+pad(mm%60)+"00"; }
+      add({start:start, end:end, summary:who+": "+it.title, desc:it.location||"", cat:who});
     } else if(it.dateStart){
       const a=parseISO(it.dateStart), b=parseISO(it.dateEnd||it.dateStart);
       add({allday:true, start:stampDay(a), end:stampDay(b), summary:(it.place||"Stay")+(it.lodgingName?" — "+it.lodgingName:""), desc:[it.lodgingType, it.summary].filter(Boolean).join("\n")});
