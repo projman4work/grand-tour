@@ -63,11 +63,16 @@
 <script>
   function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
   window.__tickets = [];
+  var DB=null;
+  function idb(){ return new Promise(function(res,rej){ if(DB)return res(DB); var r=indexedDB.open("grandtour-tix",1); r.onupgradeneeded=function(){ r.result.createObjectStore("kv"); }; r.onsuccess=function(){ DB=r.result; res(DB); }; r.onerror=function(){ rej(r.error); }; }); }
+  function idbGet(k){ return idb().then(function(db){ return new Promise(function(res,rej){ var rq=db.transaction("kv","readonly").objectStore("kv").get(k); rq.onsuccess=function(){ res(rq.result); }; rq.onerror=function(){ rej(rq.error); }; }); }); }
+  function idbSet(k,v){ return idb().then(function(db){ return new Promise(function(res,rej){ var tx=db.transaction("kv","readwrite"); tx.objectStore("kv").put(v,k); tx.oncomplete=res; tx.onerror=function(){ rej(tx.error); }; }); }); }
+  function saveTickets(){ idbSet("list", window.__tickets.map(function(t){ return {name:t.name, bytes:t.bytes}; })).catch(function(){}); }
   function addTickets(files){
     Array.prototype.slice.call(files||[]).forEach(function(f){
       if(!(/\.pdf$/i.test(f.name) || f.type==="application/pdf")) return;
       var r=new FileReader();
-      r.onload=function(){ window.__tickets.push({name:f.name, bytes:r.result}); renderTicketList(); };
+      r.onload=function(){ window.__tickets.push({name:f.name, bytes:r.result}); renderTicketList(); saveTickets(); };
       r.readAsArrayBuffer(f);
     });
   }
@@ -82,8 +87,8 @@
         '<button onclick="removeTicket('+i+')">Remove</button></div>';
     }).join("");
   }
-  function moveTicket(i,d){ var a=window.__tickets, j=i+d; if(j<0||j>=a.length) return; var t=a[i]; a[i]=a[j]; a[j]=t; renderTicketList(); }
-  function removeTicket(i){ window.__tickets.splice(i,1); renderTicketList(); }
+  function moveTicket(i,d){ var a=window.__tickets, j=i+d; if(j<0||j>=a.length) return; var t=a[i]; a[i]=a[j]; a[j]=t; renderTicketList(); saveTickets(); }
+  function removeTicket(i){ window.__tickets.splice(i,1); renderTicketList(); saveTickets(); }
   function printTicket(i){ var t=window.__tickets[i]; if(!t) return; window.open(URL.createObjectURL(new Blob([t.bytes],{type:"application/pdf"})),"_blank"); }
   function ensurePdfLib(){ return window.PDFLib ? Promise.resolve() : new Promise(function(res,rej){ var s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"; s.onload=res; s.onerror=function(){ rej(new Error("could not load PDF tools")); }; document.head.appendChild(s); }); }
   function printAllTickets(){
@@ -106,7 +111,7 @@
     ["dragover","dragenter"].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.add("over"); }); });
     ["dragleave","drop"].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.remove("over"); }); });
     dz.addEventListener("drop",function(e){ if(e.dataTransfer&&e.dataTransfer.files) addTickets(e.dataTransfer.files); });
-    renderTicketList();
+    idbGet("list").then(function(list){ if(Array.isArray(list)) window.__tickets=list; renderTicketList(); }).catch(function(){ renderTicketList(); });
   })();
 </script>
 </body>

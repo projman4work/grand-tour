@@ -1101,7 +1101,7 @@ function render(){
     '</div><div class="cb-total">'+euNights+' nights across Europe &middot; the US is home, so it&rsquo;s not counted.</div></section>';
 
   const tabsHtml = '<div class="tabs"><span class="tab active">Itinerary</span><a class="tab" href="tickets.html">Tickets &amp; Print</a></div>';
-  const docsBar = '<div class="cal-bar"><button class="cal-btn" onclick="openItineraryPrint()">&#128462; Preview &amp; print itinerary</button> <button class="cal-btn" onclick="exportICS()">&#128197; Add to Google / Outlook calendar</button></div>';
+  const docsBar = '<div class="cal-bar"><button class="cal-btn" onclick="downloadItineraryPDF()">&#11015; Download itinerary (PDF)</button> <button class="cal-btn" onclick="openItineraryPrint()">&#128462; Preview &amp; print</button> <button class="cal-btn" onclick="exportICS()">&#128197; Add to calendar</button></div>';
 
   // ---- 1) Tickets to book ----
   const tix=[];
@@ -1292,7 +1292,7 @@ window.setupDocuments=function(){
   renderTicketList();
 };
 
-window.openItineraryPrint=function(){
+function buildItin(){
   var items=(state.items||[]);
   var whoTag={alexis:" (Alexis)", ben:" (Ben)", both:""};
   var placeSection={"London & The Chilterns":"Arrival & the South Coast","Cary Arms & Spa":"Arrival & the South Coast","Paris":"Paris","South of France":"South of France","Barcelona":"Barcelona","London & Home":"Back to the UK & the Wedding","London — the wedding":"Back to the UK & the Wedding","Home, Prestwood":"Back to the UK & the Wedding","Nashville":"Nashville"};
@@ -1325,22 +1325,35 @@ window.openItineraryPrint=function(){
   var body="";
   order.forEach(function(sec){ body+='<section class="psec"><h1 class="ptitle">'+esc(sec)+'</h1>'+ bySection[sec].map(entry).join("") +'</section>'; });
   var meta=state.meta||{};
-  var doc='<!doctype html><html><head><meta charset="utf-8"><title>'+esc(strip(meta.title||"Itinerary"))+'</title><style>'+
-    '@page{margin:18mm;}html,body{background:#fff;color:#1c1c1c;}'+
+  var css='html,body{background:#fff;color:#1c1c1c;}'+
     'body{font-family:Georgia,"Times New Roman",serif;line-height:1.5;padding:24px;max-width:720px;margin:0 auto;}'+
     '.no-print{position:fixed;top:12px;right:12px;}.pbtn{font:inherit;font-size:13px;padding:8px 16px;border:1px solid #1c1c1c;background:#1c1c1c;color:#fff;border-radius:20px;cursor:pointer;}'+
-    '.cover{height:86vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;page-break-after:always;}'+
+    '.cover{text-align:center;padding:32% 0;page-break-after:always;}'+
     '.cover .eb{text-transform:uppercase;letter-spacing:.3em;font-size:12px;color:#666;}.cover h1{font-size:42px;margin:14px 0 6px;}.cover .sub{color:#444;font-size:15px;}'+
     '.psec{page-break-before:always;}.ptitle{font-size:30px;border-bottom:2px solid #1c1c1c;padding-bottom:8px;margin:0 0 18px;}'+
     '.pe{margin:0 0 15px;padding-bottom:13px;border-bottom:1px solid #ddd;}.pe-h{font-weight:700;font-size:16px;}.pe-m{font-size:13px;color:#555;margin-top:2px;}.pe-n{font-size:13px;color:#333;margin-top:5px;}'+
-    '@media print{.no-print{display:none;}}'+
-    '</style></head><body>'+
-    '<div class="no-print"><button class="pbtn" onclick="window.print()">Print</button></div>'+
-    '<div class="cover"><div class="eb">'+esc(strip(meta.eyebrow||""))+'</div><h1>'+esc(strip(meta.title||"The Grand Tour"))+'</h1><div class="sub">'+esc(strip(meta.subtitle||""))+'</div></div>'+
-    body+'</body></html>';
+    '@media print{.no-print{display:none;}}';
+  var cover='<div class="cover"><div class="eb">'+esc(strip(meta.eyebrow||""))+'</div><h1>'+esc(strip(meta.title||"The Grand Tour"))+'</h1><div class="sub">'+esc(strip(meta.subtitle||""))+'</div></div>';
+  return { css:css, inner:cover+body, title:strip(meta.title||"Itinerary") };
+}
+window.openItineraryPrint=function(){
+  var d=buildItin();
+  var doc='<!doctype html><html><head><meta charset="utf-8"><title>'+esc(d.title)+'</title><style>@page{margin:18mm;}'+d.css+'</style></head><body>'+
+    '<div class="no-print"><button class="pbtn" onclick="window.print()">Print</button></div>'+d.inner+'</body></html>';
   var w=window.open("","_blank");
   if(!w){ alert("Please allow pop-ups to preview the itinerary."); return; }
   w.document.open(); w.document.write(doc); w.document.close();
+};
+function ensureHtml2Pdf(){ return window.html2pdf ? Promise.resolve() : new Promise(function(res,rej){ var s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"; s.onload=res; s.onerror=function(){ rej(new Error("could not load PDF tools")); }; document.head.appendChild(s); }); }
+window.downloadItineraryPDF=function(){
+  var d=buildItin();
+  ensureHtml2Pdf().then(function(){
+    var el=document.createElement("div");
+    el.style.cssText="position:fixed;left:-9999px;top:0;width:760px;background:#fff;";
+    el.innerHTML='<style>'+d.css+'</style>'+d.inner;
+    document.body.appendChild(el);
+    return window.html2pdf().set({margin:[10,10,10,10], filename:"grand-tour-2026.pdf", image:{type:"jpeg",quality:0.96}, html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff"}, jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}, pagebreak:{mode:["css","legacy"]}}).from(el).save().then(function(){ setTimeout(function(){ el.remove(); },1500); });
+  }).catch(function(e){ alert("Could not build the PDF: "+((e&&e.message)||e)); });
 };
 
 function node(inner, iconKey, openable, id){
