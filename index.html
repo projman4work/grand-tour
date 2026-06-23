@@ -811,16 +811,17 @@ const SEED = {
       "lodgingType": "Stratford House, near Oxford Street",
       "lodgingStatus": "tobook",
       "summary": "Pippa & Mungo's wedding at St Lawrence Jewry (17 Jul). One night at the Oriental Club, then back to Prestwood the next day.",
-      "guide": [
-        {
-          "id": "g50",
-          "cat": "exp",
-          "title": "Pippa & Mungo's wedding",
-          "note": "Ceremony at St Lawrence Jewry, City of London. Fri 17 July.",
-          "ticket": false,
-          "status": ""
-        }
-      ]
+      "guide": []
+    },
+    {
+      "id": "ev2",
+      "type": "event",
+      "who": "both",
+      "title": "Pippa & Mungo's wedding",
+      "location": "St Lawrence Jewry, City of London",
+      "date": "2026-07-17",
+      "time": "",
+      "mins": 0
     },
     {
       "id": "j6c",
@@ -1059,6 +1060,19 @@ function render(){
     .ci-note{font-size:13.5px;color:var(--ink-soft,#5b5446);margin-top:2px;}
     .lodge-go{display:inline-block;width:15px;height:15px;vertical-align:-2px;color:var(--gold-deep,#9a7b2e);}
     #addStop,#addJourney,#filterBook,#expandAll{display:none;}
+    #docs-panel{max-width:840px;margin:0 auto 34px;border:1px solid var(--line,#e6e0d4);border-radius:14px;padding:20px 22px;}
+    .docs-h{font-family:"Cormorant Garamond",serif;font-size:24px;color:var(--gold-deep,#9a7b2e);margin:0 0 14px;}
+    .docs-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+    .docs-btn{font-family:inherit;font-size:13px;letter-spacing:.03em;padding:9px 16px;border:1px solid var(--gold-deep,#9a7b2e);background:var(--gold-deep,#9a7b2e);color:#fff;border-radius:22px;cursor:pointer;}
+    .docs-btn.ghost{background:transparent;color:var(--gold-deep,#9a7b2e);}
+    .docs-sub{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted,#9a8f78);margin:16px 0 8px;}
+    .dropzone{border:1.5px dashed #b8a06a;border-radius:12px;padding:22px;text-align:center;color:var(--ink-soft,#5b5446);cursor:pointer;background:#faf8f3;}
+    .dropzone.over{background:#f1ead8;border-color:var(--gold-deep,#9a7b2e);}
+    .ticket-list{display:grid;gap:8px;margin-top:12px;}
+    .tk-row{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line,#e6e0d4);border-radius:9px;}
+    .tk-row .nm{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .tk-row button{font-family:inherit;font-size:12px;border:1px solid var(--line,#e6e0d4);background:#fff;border-radius:6px;padding:4px 8px;cursor:pointer;color:var(--ink-soft,#5b5446);}
+    @media print{ #docs-panel,.toolbar,.mast .stats{display:none!important;} }
   </style>`;
 
   // ---- 0) Time in Europe (USA = home, not counted) ----
@@ -1147,6 +1161,7 @@ function render(){
   cHtml+='</section>';
 
   tl.innerHTML = STYLE + cbHtml + calBtn + tHtml + dHtml + cHtml;
+  try{ if(window.setupDocuments) setupDocuments(); }catch(e){}
 }
 
 // ---- Calendar export (.ics — imports into Google Calendar & Outlook) ----
@@ -1181,10 +1196,14 @@ window.exportICS = function(){
       else { const d=parseISO(it.date); const nx=new Date(d); nx.setDate(nx.getDate()+1); add({allday:true, start:stampDay(d), end:stampDay(nx), summary:summary, desc:desc, cat:who}); }
     } else if(it.type==="event" && it.date){
       const who = whoName[it.who||"both"];
-      const start = dtLocal(it.date, it.time);
-      let end = null;
-      if(start){ const total=(toMin(it.time)||0)+(it.mins||60); const d=parseISO(it.date); d.setDate(d.getDate()+Math.floor(total/1440)); const mm=total%1440; end=stampDay(d)+"T"+pad(Math.floor(mm/60))+pad(mm%60)+"00"; }
-      add({start:start, end:end, summary:who+": "+it.title, desc:it.location||"", cat:who});
+      if(it.time){
+        const start = dtLocal(it.date, it.time);
+        const total=(toMin(it.time)||0)+(it.mins||60); const d=parseISO(it.date); d.setDate(d.getDate()+Math.floor(total/1440)); const mm=total%1440; const end=stampDay(d)+"T"+pad(Math.floor(mm/60))+pad(mm%60)+"00";
+        add({start:start, end:end, summary:who+": "+it.title, desc:it.location||"", cat:who});
+      } else {
+        const d=parseISO(it.date); const nx=new Date(d); nx.setDate(nx.getDate()+1);
+        add({allday:true, start:stampDay(d), end:stampDay(nx), summary:who+": "+it.title, desc:it.location||"", cat:who});
+      }
     } else if(it.dateStart){
       const a=parseISO(it.dateStart), b=parseISO(it.dateEnd||it.dateStart);
       add({allday:true, start:stampDay(a), end:stampDay(b), summary:(it.place||"Stay")+(it.lodgingName?" — "+it.lodgingName:""), desc:[it.lodgingType, it.summary].filter(Boolean).join("\n")});
@@ -1196,6 +1215,120 @@ window.exportICS = function(){
   a.href = URL.createObjectURL(blob);
   a.download = "grand-tour-2026.ics";
   document.body.appendChild(a); a.click(); a.remove();
+};
+
+// ============ Documents: ticket PDFs + printable itinerary ============
+if(typeof window!=="undefined" && !window.__tickets) window.__tickets=[];
+
+function addTickets(files){
+  Array.prototype.slice.call(files||[]).forEach(function(f){
+    if(!(/\.pdf$/i.test(f.name) || f.type==="application/pdf")) return;
+    var r=new FileReader();
+    r.onload=function(){ window.__tickets.push({name:f.name, bytes:r.result}); renderTicketList(); };
+    r.readAsArrayBuffer(f);
+  });
+}
+function renderTicketList(){
+  var el=document.getElementById("ticketList"); if(!el) return;
+  if(!window.__tickets.length){ el.innerHTML='<div class="docs-sub" style="margin:6px 0 0">No tickets yet — drop PDFs above.</div>'; return; }
+  el.innerHTML=window.__tickets.map(function(t,i){
+    return '<div class="tk-row"><span class="nm">'+(i+1)+'. '+esc(t.name)+'</span>'+
+      '<button onclick="moveTicket('+i+',-1)" title="Up">&#9650;</button>'+
+      '<button onclick="moveTicket('+i+',1)" title="Down">&#9660;</button>'+
+      '<button onclick="printTicket('+i+')">Print</button>'+
+      '<button onclick="removeTicket('+i+')">Remove</button></div>';
+  }).join("");
+}
+window.moveTicket=function(i,d){ var a=window.__tickets, j=i+d; if(j<0||j>=a.length) return; var t=a[i]; a[i]=a[j]; a[j]=t; renderTicketList(); };
+window.removeTicket=function(i){ window.__tickets.splice(i,1); renderTicketList(); };
+window.printTicket=function(i){ var t=window.__tickets[i]; if(!t) return; var url=URL.createObjectURL(new Blob([t.bytes],{type:"application/pdf"})); window.open(url,"_blank"); };
+function ensurePdfLib(){ return window.PDFLib ? Promise.resolve() : new Promise(function(res,rej){ var s=document.createElement("script"); s.src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"; s.onload=res; s.onerror=function(){ rej(new Error("could not load PDF tools")); }; document.head.appendChild(s); }); }
+window.printAllTickets=function(){
+  if(!window.__tickets.length){ alert("Drop your ticket PDFs in first."); return; }
+  ensurePdfLib().then(function(){
+    var PDFDocument=window.PDFLib.PDFDocument;
+    return PDFDocument.create().then(function(merged){
+      var chain=Promise.resolve();
+      window.__tickets.forEach(function(t){
+        chain=chain.then(function(){ return PDFDocument.load(t.bytes.slice(0)).then(function(src){ return merged.copyPages(src, src.getPageIndices()).then(function(pages){ pages.forEach(function(p){ merged.addPage(p); }); }); }); });
+      });
+      return chain.then(function(){ return merged.save(); }).then(function(bytes){ window.open(URL.createObjectURL(new Blob([bytes],{type:"application/pdf"})),"_blank"); });
+    });
+  }).catch(function(e){ alert("Could not merge the PDFs: "+((e&&e.message)||e)); });
+};
+
+window.setupDocuments=function(){
+  if(document.getElementById("docs-panel")){ renderTicketList(); return; }
+  var tl=document.getElementById("timeline"); if(!tl||!tl.parentNode) return;
+  var sec=document.createElement("section"); sec.id="docs-panel"; sec.className="docs";
+  sec.innerHTML=
+    '<h2 class="docs-h">Documents</h2>'+
+    '<div class="docs-row"><button class="docs-btn" onclick="openItineraryPrint()">Preview &amp; print itinerary</button></div>'+
+    '<div class="docs-sub">Tickets (Alexis) — drag &amp; drop PDFs, reorder, then print</div>'+
+    '<div id="dropzone" class="dropzone">Drop ticket PDFs here, or click to choose</div>'+
+    '<input type="file" id="ticketInput" accept="application/pdf" multiple style="display:none">'+
+    '<div id="ticketList" class="ticket-list"></div>'+
+    '<div class="docs-row" style="margin-top:12px"><button class="docs-btn ghost" onclick="printAllTickets()">Print all tickets (in order)</button></div>';
+  var tb=document.querySelector(".toolbar");
+  if(tb) tb.insertAdjacentElement("afterend", sec); else tl.parentNode.insertBefore(sec, tl);
+  var dz=document.getElementById("dropzone"), inp=document.getElementById("ticketInput");
+  dz.addEventListener("click",function(){ inp.click(); });
+  inp.addEventListener("change",function(e){ addTickets(e.target.files); inp.value=""; });
+  ["dragover","dragenter"].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ dz.addEventListener(ev,function(e){ e.preventDefault(); dz.classList.remove("over"); }); });
+  dz.addEventListener("drop",function(e){ if(e.dataTransfer&&e.dataTransfer.files) addTickets(e.dataTransfer.files); });
+  renderTicketList();
+};
+
+window.openItineraryPrint=function(){
+  var items=(state.items||[]);
+  var whoTag={alexis:" (Alexis)", ben:" (Ben)", both:""};
+  var placeSection={"London & The Chilterns":"Arrival & the South Coast","Cary Arms & Spa":"Arrival & the South Coast","Paris":"Paris","South of France":"South of France","Barcelona":"Barcelona","London & Home":"Back to the UK & the Wedding","London — the wedding":"Back to the UK & the Wedding","Home, Prestwood":"Back to the UK & the Wedding","Nashville":"Nashville"};
+  var secOf=function(pl){ return placeSection[pl]||pl||"Other"; };
+  var nextStop=function(idx){ for(var j=idx+1;j<items.length;j++) if(items[j].type==="stop") return secOf(items[j].place); return null; };
+  var prevStop=function(idx){ for(var j=idx-1;j>=0;j--) if(items[j].type==="stop") return secOf(items[j].place); return null; };
+  var bySection={}, order=[];
+  items.forEach(function(it,idx){
+    var sec = it.type==="stop"?secOf(it.place):(it.type==="journey"?(nextStop(idx)||prevStop(idx)||"Travel"):(prevStop(idx)||nextStop(idx)||"Events"));
+    if(!bySection[sec]){ bySection[sec]=[]; order.push(sec); }
+    bySection[sec].push(it);
+  });
+  var D1=function(s){ var d=parseISO(s); return d?DAYS[d.getDay()]+" "+d.getDate()+" "+MONTHS[d.getMonth()]:""; };
+  var strip=function(s){ return (s==null?"":String(s)).replace(/<[^>]+>/g,"").replace(/&middot;/g,"·"); };
+  function entry(it){
+    if(it.type==="journey"){
+      var det=[]; if(it.depart) det.push(esc(it.depart)+(it.arrive?" – "+esc(it.arrive):"")); if(it.operator) det.push(esc(it.operator));
+      return '<div class="pe"><div class="pe-h">'+(it.mode==="train"?"Train":(it.mode==="plane"?"Flight":"Travel"))+': '+esc(it.from||"")+' &rarr; '+esc(it.to||"")+esc(whoTag[it.who||"both"])+'</div>'+
+        '<div class="pe-m">'+esc(D1(it.date))+(det.length?' &middot; '+det.join(" &middot; "):"")+'</div>'+
+        (it.note?'<div class="pe-n">'+esc(it.note)+'</div>':'')+'</div>';
+    }
+    if(it.type==="event"){
+      return '<div class="pe"><div class="pe-h">'+esc(it.title||"")+esc(whoTag[it.who||"both"])+'</div>'+
+        '<div class="pe-m">'+esc(D1(it.date))+(it.time?' &middot; '+esc(it.time):"")+(it.location?' &middot; '+esc(it.location):"")+'</div></div>';
+    }
+    if(!it.lodgingName && !it.dateStart) return "";
+    var lodge = it.lodgingName ? '<div class="pe-h">'+esc(it.lodgingName)+(it.lodgingType?' &middot; '+esc(it.lodgingType):"")+'</div>'+(it.summary?'<div class="pe-n">'+esc(it.summary)+'</div>':"") : "";
+    return '<div class="pe"><div class="pe-m">'+esc(it.place||"")+' &middot; '+esc(fmtRange(it.dateStart,it.dateEnd))+'</div>'+lodge+'</div>';
+  }
+  var body="";
+  order.forEach(function(sec){ body+='<section class="psec"><h1 class="ptitle">'+esc(sec)+'</h1>'+ bySection[sec].map(entry).join("") +'</section>'; });
+  var meta=state.meta||{};
+  var doc='<!doctype html><html><head><meta charset="utf-8"><title>'+esc(strip(meta.title||"Itinerary"))+'</title><style>'+
+    '@page{margin:18mm;}html,body{background:#fff;color:#1c1c1c;}'+
+    'body{font-family:Georgia,"Times New Roman",serif;line-height:1.5;padding:24px;max-width:720px;margin:0 auto;}'+
+    '.no-print{position:fixed;top:12px;right:12px;}.pbtn{font:inherit;font-size:13px;padding:8px 16px;border:1px solid #1c1c1c;background:#1c1c1c;color:#fff;border-radius:20px;cursor:pointer;}'+
+    '.cover{height:86vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;page-break-after:always;}'+
+    '.cover .eb{text-transform:uppercase;letter-spacing:.3em;font-size:12px;color:#666;}.cover h1{font-size:42px;margin:14px 0 6px;}.cover .sub{color:#444;font-size:15px;}'+
+    '.psec{page-break-before:always;}.ptitle{font-size:30px;border-bottom:2px solid #1c1c1c;padding-bottom:8px;margin:0 0 18px;}'+
+    '.pe{margin:0 0 15px;padding-bottom:13px;border-bottom:1px solid #ddd;}.pe-h{font-weight:700;font-size:16px;}.pe-m{font-size:13px;color:#555;margin-top:2px;}.pe-n{font-size:13px;color:#333;margin-top:5px;}'+
+    '@media print{.no-print{display:none;}}'+
+    '</style></head><body>'+
+    '<div class="no-print"><button class="pbtn" onclick="window.print()">Print</button></div>'+
+    '<div class="cover"><div class="eb">'+esc(strip(meta.eyebrow||""))+'</div><h1>'+esc(strip(meta.title||"The Grand Tour"))+'</h1><div class="sub">'+esc(strip(meta.subtitle||""))+'</div></div>'+
+    body+'</body></html>';
+  var w=window.open("","_blank");
+  if(!w){ alert("Please allow pop-ups to preview the itinerary."); return; }
+  w.document.open(); w.document.write(doc); w.document.close();
 };
 
 function node(inner, iconKey, openable, id){
