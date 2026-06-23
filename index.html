@@ -1205,8 +1205,15 @@ window.exportICS = function(){
       const start = it.depart ? dtLocal(it.date, it.depart) : null;
       let end = (start && it.arrive) ? dtLocal(it.date, it.arrive) : null;
       if(start && end && end <= start){ const d=parseISO(it.date); d.setDate(d.getDate()+1); const mins=toMin(it.arrive)||0; end = stampDay(d)+"T"+pad(Math.floor(mins/60))+pad(mins%60)+"00"; }
-      const summary = kind+" ("+who+"): "+(it.from||"")+" → "+(it.to||"");
-      const desc = [it.operator, it.duration, it.note].filter(Boolean).join(" — ");
+      const glyph = it.mode==="plane" ? "✈ " : (it.mode==="train" ? "🚆 " : "→ ");
+      const summary = glyph+(it.from||"")+" → "+(it.to||"")+(who!=="Both"?" ("+who+")":"");
+      const dl=["Traveller: "+who];
+      if(it.operator) dl.push((it.mode==="plane"?"Flight: ":(it.mode==="train"?"Service: ":"Operator: "))+it.operator);
+      if(it.depart) dl.push("Depart: "+it.depart+(it.from?" — "+it.from:""));
+      if(it.arrive) dl.push("Arrive: "+it.arrive+(it.to?" — "+it.to:""));
+      if(it.duration) dl.push("Duration: "+it.duration);
+      if(it.note) dl.push(it.note);
+      const desc = dl.join("\n");
       if(start) add({start:start, end:end, summary:summary, desc:desc, cat:who});
       else { const d=parseISO(it.date); const nx=new Date(d); nx.setDate(nx.getDate()+1); add({allday:true, start:stampDay(d), end:stampDay(nx), summary:summary, desc:desc, cat:who}); }
     } else if(it.type==="event" && it.date){
