@@ -723,7 +723,9 @@ const SEED = {
       "note": "BOOKED — Vueling flight VY1516, Nice (NCE) to Barcelona (BCN), direct. Booking code CL66UG. Depart 08:55, arrive 10:15, Wed 8 Jul. Passengers: Benjamin Smith (seat 16E) and Alexis Cook (seat 16D). Each: 1 underseat bag + 1 overhead cabin bag.",
       "who": "both",
       "depart": "08:55",
-      "arrive": "10:15"
+      "arrive": "10:15",
+      "conf": "CL66UG",
+      "seats": "Ben 16E · Alexis 16D"
     },
     {
       "id": "s5",
@@ -803,7 +805,9 @@ const SEED = {
       "note": "BOOKED — Wizz Air flight W95362, Barcelona El Prat (BCN) to London Luton (LTN). Confirmation TLT2WC. Depart 09:35, arrive 11:00 (2h 25m), Wed 11 Jul. Passengers: Benjamin Smith (seat 2E) and Alexis Cook (seat 2D). Wizz Priority: free under-seat bag + trolley bag + priority boarding. Online check-in from before 06:35 on 11 Jul.",
       "depart": "09:35",
       "who": "both",
-      "arrive": "11:00"
+      "arrive": "11:00",
+      "conf": "TLT2WC",
+      "seats": "Ben 2E · Alexis 2D"
     },
     {
       "id": "s6",
@@ -1140,7 +1144,21 @@ function render(){
     .dte-t{font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted,#9a8f78);min-width:46px;}
     .dte-l{font-weight:600;font-size:14px;display:block;}
     .dte-s{font-size:12.5px;color:var(--ink-soft,#5b5446);}
+    .dte-conf{display:block;margin-top:3px;font-size:12px;font-weight:600;color:#3a5a40;letter-spacing:.03em;font-variant-numeric:tabular-nums;}
     .day-empty{color:var(--ink-soft,#5b5446);font-style:italic;}
+    .cal-hint{display:none;}
+    /* Phones only: the 7-column month grid is too narrow to read, so give each
+       day a legible minimum width and let the calendar scroll sideways.
+       Laptop/tablet (wider than 600px) keep the current full-width layout. */
+    @media (max-width:600px){
+      .cal-hint{display:block;font-size:11px;color:var(--muted,#9a8f78);letter-spacing:.04em;margin:0 0 10px;}
+      .cal-grid{grid-template-columns:repeat(7,minmax(82px,1fr));overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
+      .cal-cell{min-height:78px;padding:5px 5px 7px;}
+      .cal-dn{font-size:12.5px;margin-bottom:4px;}
+      .cal-chip{font-size:10.5px;padding:2px 6px;}
+      .cal-more{font-size:10.5px;}
+      .cal-mh{font-size:22px;}
+    }
   </style>`;
 
   // ---- 0) Time in Europe (USA = home, not counted) ----
@@ -1196,6 +1214,7 @@ function render(){
   }
   let dHtml='<section class="dbd-sec"><h2 class="dbd-h"><span class="dbd-em">&#128197;</span> Calendar</h2>'+
     '<div class="dbd-legend"><span class="lg lg-both"><i></i>Together</span><span class="lg lg-alexis"><i></i>Alexis</span><span class="lg lg-ben"><i></i>Ben</span><span class="lg lg-stay"><i></i>Stay</span></div>'+
+    '<div class="cal-hint">&#128072; Swipe across each month to see every day.</div>'+
     grids+'</section>';
 
   // ---- 3) The places ----
@@ -1308,13 +1327,13 @@ window.openDay=function(y,m,day){
   var timed=[];
   items.forEach(function(it){
     if(it.type==="event" && onDay(it.date)) timed.push({t:it.time||"", label:it.title||"", sub:it.location||"", who:it.who||"both"});
-    else if(it.type==="journey" && onDay(it.date)) timed.push({t:it.depart||"", label:(it.from||"")+" → "+(it.to||""), sub:[it.operator,it.duration].filter(Boolean).join(" · "), who:it.who||"both"});
+    else if(it.type==="journey" && onDay(it.date)) timed.push({t:it.depart||"", label:(it.from||"")+" → "+(it.to||""), sub:[it.operator,it.duration].filter(Boolean).join(" · "), conf:it.conf||"", seats:it.seats||"", who:it.who||"both"});
   });
   timed.sort(function(a,b){ return (a.t||"zz").localeCompare(b.t||"zz"); });
   var DAYL=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var dateLabel=DAYL[target.getDay()]+", "+day+" "+MONTHS[m]+" "+y;
   var rows = timed.length
-    ? timed.map(function(e){ return '<div class="dte who-'+e.who+'"><span class="dte-t">'+esc(e.t||"—")+'</span><div><span class="dte-l">'+esc(e.label)+'</span>'+(e.sub?'<span class="dte-s">'+esc(e.sub)+'</span>':'')+'</div></div>'; }).join("")
+    ? timed.map(function(e){ var meta=[]; if(e.conf) meta.push('Conf. '+esc(e.conf)); if(e.seats) meta.push('Seats '+esc(e.seats)); var metaHtml=meta.length?'<span class="dte-conf">'+meta.join(' &middot; ')+'</span>':''; return '<div class="dte who-'+e.who+'"><span class="dte-t">'+esc(e.t||"—")+'</span><div><span class="dte-l">'+esc(e.label)+'</span>'+(e.sub?'<span class="dte-s">'+esc(e.sub)+'</span>':'')+metaHtml+'</div></div>'; }).join("")
     : '<div class="day-empty">Nothing scheduled'+(place?' — a free day in '+esc(place.place):'')+'.</div>';
   var html='<div class="day-modal"><button class="day-x" onclick="closeDay()">&times;</button>'+
     '<div class="day-date">'+esc(dateLabel)+'</div>'+
